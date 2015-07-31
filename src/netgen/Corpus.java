@@ -106,9 +106,11 @@ public class Corpus {
 //    private static ArrayList<String> lemmatize(ArrayList<String> input) {
 //        
 //    }
+    
+    
     public static HashSet<Token> getStopwords() {
         HashSet<Token> stopTokens = new HashSet<>();
-        String stopwords = "the over i see but if in an of it and to is be at they take also put or has their its as our on for have had out that would will we have";
+        String stopwords = "the over i see but if th st who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
         stopTokens.addAll(tokenize(stopwords));
 
         return stopTokens;
@@ -118,8 +120,7 @@ public class Corpus {
     public static void main(String[] args) {
 
         ArrayList<String> input = read("newsarticle3.txt");
-
-        //String s = "The quick brown fox jumped over the lazy dog;   2356a    I didn't see, but the N.S.A. sees all.2 If a tree falls in the forest?";
+        
         ArrayList<String> strings = filterCharacters(splitIntoSentences(input));
 
         ArrayList<ArrayList<Token>> tokens = tokenize(strings);
@@ -137,7 +138,7 @@ public class Corpus {
 
         System.out.println("Edges: " + network.edges.size());
         
-        network.writeEdgelist("output.txt");
+        network.writeEdgelist("output.dl");
     }
 
 }

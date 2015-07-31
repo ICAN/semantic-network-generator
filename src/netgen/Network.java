@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-
 public class Network {
 
     HashMap<Pair, Double> edges = new HashMap<>();
@@ -17,8 +16,6 @@ public class Network {
         this.frequency = getFrequencyMap(tokenizedCorpus);
         this.edges = sentenceCompleteGraphs(tokenizedCorpus);
     }
-
-    
 
     //Forms a complete graph of a window which slides through each line 
     //Returns the sum of all of these graphs
@@ -89,19 +86,31 @@ public class Network {
     //Writes the graph to an .dl file, weighted edge list format
     public void writeEdgelist(String fileName) {
 
+        ArrayList<Pair> unfilteredEdgeList = new ArrayList<>();
         ArrayList<Pair> edgeList = new ArrayList<>();
-        edgeList.addAll(edges.keySet());
+        unfilteredEdgeList.addAll(edges.keySet());
 
-        FileWriter writer = null;
+        for (Pair pair : unfilteredEdgeList) {
+            if (edges.get(pair) > 1.5) {
+                edgeList.add(pair);
+            }
+        }
+
+        System.out.println("Filtered edges: " + edgeList.size());
+
         try {
-            writer = new FileWriter(new File(fileName));
-            writer.write("dl\nformat = edgelist1\nn=" + edges.size() + "\ndata:");
+            File file = new File(fileName);
+            FileWriter writer = null;
+            writer = new FileWriter(file);
+            writer.write("dl\nformat = edgelist1\t\nn=" + edges.size() + "\t\ndata:");
 
             for (Pair pair : edgeList) {
                 writer.write("\n" + pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
                 System.out.println(pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
             }
-
+            
+            writer.close();
+            
         } catch (Exception e) {
             System.out.println("Failed to complete output file. Exiting.");
             System.exit(-1);
@@ -109,17 +118,4 @@ public class Network {
 
     }
 
-
-
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
 }
