@@ -1,10 +1,6 @@
 
 package netgen;
 
-/**
- *
- * @author Neal
- */
 public class Pair {
     private Token a;
     private Token b;
@@ -54,8 +50,25 @@ public class Pair {
         } else {
             this.a = new Token(b);
             this.b = new Token(a);
+        }    
+    }
+    
+    
+    @Override
+    public boolean equals(Object other) {
+        if(other.getClass() != this.getClass()) {
+            return false;
+        } else if (a.getSignature().equalsIgnoreCase(((Pair)other).getA().getSignature())
+                && b.getSignature().equalsIgnoreCase(((Pair)other).getB().getSignature())) {
+            return true;
+        } else {
+            return false;
         }
-        
+    }
+    
+    @Override
+    public int hashCode() {
+        return (a.hashCode()/2 + a.hashCode()%2 - b.hashCode()%2 + b.hashCode()/2);
     }
     
 }

@@ -7,57 +7,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-/**
- *
- * Neal Logan
- *
- */
+
 public class Network {
 
     HashMap<Pair, Double> edges = new HashMap<>();
     HashMap<Token, Integer> frequency = new HashMap<>();
 
-    public Network(String fileName) {
-        ArrayList<Token[]> tokenizedCorpus = read(fileName);
-        this.frequency = getFrequency(tokenizedCorpus);
-        this.edges = slidingWindow(tokenizedCorpus, 3);        
+    public Network(ArrayList<ArrayList<Token>> tokenizedCorpus) {
+        this.frequency = getFrequencyMap(tokenizedCorpus);
+        this.edges = sentenceCompleteGraphs(tokenizedCorpus);
     }
 
-    //Takes input from a text file and produces an arraylist of lines
-    private ArrayList<Token[]> read(String fileName) {
-        Scanner inFile = null;
-        ArrayList<Token[]> tokenizedLines = new ArrayList<>();
-
-        try {
-            inFile = new Scanner(new FileReader(fileName));
-        } catch (Exception e) {
-            System.out.println("Failed to open input file. Exiting.");
-            System.exit(-1);
-        }
-
-        while (inFile.hasNextLine()) {
-            String[] line = inFile.nextLine().trim().toLowerCase().split(" ");
-            Token[] tokens = new Token[line.length];
-            for (int i = 0; i < line.length; i++) {
-                tokens[i] = new Token(line[i]);
-            }
-            tokenizedLines.add(tokens);
-        }
-        return tokenizedLines;
-    }
+    
 
     //Forms a complete graph of a window which slides through each line 
     //Returns the sum of all of these graphs
     //Tokens will not be linked to themselves.
     //Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> slidingWindow(ArrayList<Token[]> lines, int windowSize) {
+    private HashMap<Pair, Double> slidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
 
-        for (Token[] line : lines) {
-            for (int i = 0; i < line.length - windowSize; i++) {
+        for (ArrayList<Token> line : lines) {
+            for (int i = 0; i < line.size() - windowSize; i++) {
                 for (int j = i + 1; j < i + windowSize; j++) {
-                    if (!line[i].equals(line[j])) {
-                        Pair pair = new Pair(line[i].getSignature(), line[j].getSignature());
+                    if (!line.get(i).equals(line.get(j))) {
+                        Pair pair = new Pair(line.get(i).getSignature(), line.get(j).getSignature());
                         if (network.containsKey(pair)) {
                             network.put(pair, network.get(pair) + 1);
                         } else {
@@ -71,16 +45,16 @@ public class Network {
     }
 
     //Forms a complete graph of every line and returns the sum of all of these graphs
-    //Tokens will not be linked to themselves.
+    //Tokens will never be linked to themselves.
     //Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> completeLine(ArrayList<Token[]> lines) {
+    private HashMap<Pair, Double> sentenceCompleteGraphs(ArrayList<ArrayList<Token>> lines) {
         HashMap<Pair, Double> network = new HashMap<>();
 
-        for (Token[] line : lines) {
-            for (int i = 0; i < line.length - 1; i++) {
-                for (int j = i + 1; j < line.length; j++) {
-                    if (!line[i].equals(line[j])) {
-                        Pair pair = new Pair(line[i].getSignature(), line[j].getSignature());
+        for (ArrayList<Token> line : lines) {
+            for (int i = 0; i < line.size() - 1; i++) {
+                for (int j = i + 1; j < line.size(); j++) {
+                    if (!line.get(i).equals(line.get(j))) {
+                        Pair pair = new Pair(line.get(i).getSignature(), line.get(j).getSignature());
                         if (network.containsKey(pair)) {
                             network.put(pair, network.get(pair) + 1);
                         } else {
@@ -94,17 +68,17 @@ public class Network {
     }
 
     //Counts the number of occurrences of each unique token in the corpus
-    private HashMap<Token, Integer> getFrequency(ArrayList<Token[]> lines) {
+    private HashMap<Token, Integer> getFrequencyMap(ArrayList<ArrayList<Token>> lines) {
 
         HashMap<Token, Integer> count = new HashMap<>();
 
-        for (Token[] tokens : lines) {
-            for (int i = 0; i < tokens.length; i++) {
-                if (count.containsKey(tokens[i])) {
-                    int value = count.get(tokens[i]) + 1;
-                    count.put(tokens[i], value);
+        for (ArrayList<Token> tokens : lines) {
+            for (int i = 0; i < tokens.size(); i++) {
+                if (count.containsKey(tokens.get(i))) {
+                    int value = count.get(tokens.get(i)) + 1;
+                    count.put(tokens.get(i), value);
                 } else {
-                    count.put(tokens[i], 1);
+                    count.put(tokens.get(i), 1);
                 }
             }
         }
@@ -113,20 +87,21 @@ public class Network {
     }
 
     //Writes the graph to an .dl file, weighted edge list format
-    public void write(String fileName) {
-        
+    public void writeEdgelist(String fileName) {
+
         ArrayList<Pair> edgeList = new ArrayList<>();
         edgeList.addAll(edges.keySet());
-        
+
         FileWriter writer = null;
         try {
             writer = new FileWriter(new File(fileName));
             writer.write("dl\nformat = edgelist1\nn=" + edges.size() + "\ndata:");
 
             for (Pair pair : edgeList) {
-                writer.write("\n" + pair.getA() + " " + pair.getB() + " " + edges.get(pair));
+                writer.write("\n" + pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
+                System.out.println(pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
             }
-            
+
         } catch (Exception e) {
             System.out.println("Failed to complete output file. Exiting.");
             System.exit(-1);
@@ -134,4 +109,17 @@ public class Network {
 
     }
 
+
+
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
 }
