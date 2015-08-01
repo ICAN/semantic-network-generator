@@ -107,9 +107,16 @@ public class Corpus {
 //        
 //    }
     
+//    public static ArrayList<Token> snowballStem(ArrayList<Token> corpus) {
+//        
+//        
+//    }
+    
+    
+    
     
     public static HashSet<Token> getStopwords() {
-        HashSet<Token> stopTokens = new HashSet<>();
+        HashSet<Token> stopTokens = new HashSet<>();        
         String stopwords = "the over i see but if th st who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
         stopTokens.addAll(tokenize(stopwords));
 

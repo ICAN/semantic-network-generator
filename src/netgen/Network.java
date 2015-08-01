@@ -19,7 +19,7 @@ public class Network {
 
     //Forms a complete graph of a window which slides through each line 
     //Returns the sum of all of these graphs
-    //Tokens will not be linked to themselves.
+    //Tokens will never be linked to identical tokens.
     //Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
     private HashMap<Pair, Double> slidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
@@ -28,7 +28,9 @@ public class Network {
             for (int i = 0; i < line.size() - windowSize; i++) {
                 for (int j = i + 1; j < i + windowSize; j++) {
                     if (!line.get(i).equals(line.get(j))) {
+                        
                         Pair pair = new Pair(line.get(i).getSignature(), line.get(j).getSignature());
+                        
                         if (network.containsKey(pair)) {
                             network.put(pair, network.get(pair) + 1);
                         } else {
