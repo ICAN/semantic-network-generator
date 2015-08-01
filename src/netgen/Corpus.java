@@ -6,9 +6,19 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import porter.Stemmer;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
 
 public class Corpus {
-
+    
+        
+    
+    
+    
     private static ArrayList<String> read(String fileName) {
         ArrayList<String> lines = new ArrayList<>();
         Scanner inFile = null;
@@ -94,7 +104,7 @@ public class Corpus {
     //Filters out everything but spaces, letters, apostrophes, and hyphens
     //Trims and converts to lower-case
     public static String filterCharacters(String input) {
-        return input.replaceAll("[^a-zA-Z \'-]", "").toLowerCase().trim();
+        return input.replaceAll("[^a-zA-Z ]", "").toLowerCase().trim();
     }
 
     public static void filterStopwords(ArrayList<ArrayList<Token>> input, HashSet<Token> stopWords) {
@@ -117,7 +127,7 @@ public class Corpus {
     
     public static HashSet<Token> getStopwords() {
         HashSet<Token> stopTokens = new HashSet<>();        
-        String stopwords = "the over i see but if th st who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
+        String stopwords = "the over i see but if th st few my show shows into which called first hundreds was said another from again one two three four five six seven eight nine ten thousands who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
         stopTokens.addAll(tokenize(stopwords));
 
         return stopTokens;
@@ -126,7 +136,9 @@ public class Corpus {
     //Test
     public static void main(String[] args) {
 
-        ArrayList<String> input = read("newsarticle3.txt");
+        Stemmer stemmer = new Stemmer();
+        
+        ArrayList<String> input = read("newsarticle9.txt");
         
         ArrayList<String> strings = filterCharacters(splitIntoSentences(input));
 
@@ -136,6 +148,8 @@ public class Corpus {
 
         for (ArrayList<Token> line : tokens) {
             for (Token token : line) {
+                token.print();
+                token.setSignature(stemmer.stem(token.getSignature()));
                 token.print();
             }
             System.out.print("\n");
