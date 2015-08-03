@@ -1,9 +1,12 @@
 package netgen;
 
+import java.util.HashSet;
+
 public class Token {
     
     private String signature;
-
+//    private HashSet<Tag> tags;
+    
     /**
      * @return the signature
      */

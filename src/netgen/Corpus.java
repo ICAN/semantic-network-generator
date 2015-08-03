@@ -6,22 +6,22 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import porter.Stemmer;
+import lancaster.Stemmer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.lang.String;
 
 
 public class Corpus {
-    
-        
     
     
     
     private static ArrayList<String> read(String fileName) {
         ArrayList<String> lines = new ArrayList<>();
         Scanner inFile = null;
+  
         try {
             inFile = new Scanner(new FileReader(fileName));
         } catch (Exception e) {
@@ -72,6 +72,8 @@ public class Corpus {
         return Corpus.splitIntoSentences(list);
     }
 
+    
+    //
     public static ArrayList<ArrayList<Token>> tokenize(ArrayList<String> input) {
         ArrayList<ArrayList<Token>> output = new ArrayList<>();
 
@@ -101,7 +103,7 @@ public class Corpus {
         return output;
     }
 
-    //Filters out everything but spaces, letters, apostrophes, and hyphens
+    //Filters out everything but spaces, letters
     //Trims and converts to lower-case
     public static String filterCharacters(String input) {
         return input.replaceAll("[^a-zA-Z ]", "").toLowerCase().trim();
@@ -127,8 +129,11 @@ public class Corpus {
     
     public static HashSet<Token> getStopwords() {
         HashSet<Token> stopTokens = new HashSet<>();        
-        String stopwords = "the over i see but if th st few my show shows into which called first hundreds was said another from again one two three four five six seven eight nine ten thousands who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
-        stopTokens.addAll(tokenize(stopwords));
+//        String stopwords = "the over i see but if th st few my show shows into which called first hundreds was said another from again one two three four five six seven eight nine ten thousands who were being been some let allow by with through almost completely years year while all he him not no those many are there here her she us his hers they theirs them in an of it and to is be at they take also put or a has their its as our on for have had out that would will we have";
+        ArrayList<String> lines = read("stopwords_long.txt");
+        for(String line : lines) {
+            stopTokens.addAll(tokenize(line));
+        }
 
         return stopTokens;
     }
@@ -138,15 +143,16 @@ public class Corpus {
 
         Stemmer stemmer = new Stemmer();
         
-        ArrayList<String> input = read("newsarticle9.txt");
+        ArrayList<String> input = read("newsarticle4.txt");
         
+//        ArrayList<String> strings = filterCharacters(splitIntoSentences(input));
         ArrayList<String> strings = filterCharacters(splitIntoSentences(input));
+        
+        ArrayList<ArrayList<Token>> tokenizedCorpus = tokenize(strings);
 
-        ArrayList<ArrayList<Token>> tokens = tokenize(strings);
+        filterStopwords(tokenizedCorpus, getStopwords());
 
-        filterStopwords(tokens, getStopwords());
-
-        for (ArrayList<Token> line : tokens) {
+        for (ArrayList<Token> line : tokenizedCorpus) {
             for (Token token : line) {
                 token.print();
                 token.setSignature(stemmer.stem(token.getSignature()));
@@ -155,7 +161,7 @@ public class Corpus {
             System.out.print("\n");
         }
 
-        Network network = new Network(tokens);
+        Network network = new Network(tokenizedCorpus);
 
         System.out.println("Edges: " + network.edges.size());
         

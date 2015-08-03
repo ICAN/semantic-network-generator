@@ -14,14 +14,14 @@ public class Network {
 
     public Network(ArrayList<ArrayList<Token>> tokenizedCorpus) {
         this.frequency = getFrequencyMap(tokenizedCorpus);
-        this.edges = sentenceCompleteGraphs(tokenizedCorpus);
+        this.edges = generateSentenceComplete(tokenizedCorpus);
     }
 
     //Forms a complete graph of a window which slides through each line 
     //Returns the sum of all of these graphs
     //Tokens will never be linked to identical tokens.
     //Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> slidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
+    private HashMap<Pair, Double> generateSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
@@ -46,7 +46,7 @@ public class Network {
     //Forms a complete graph of every line and returns the sum of all of these graphs
     //Tokens will never be linked to themselves.
     //Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> sentenceCompleteGraphs(ArrayList<ArrayList<Token>> lines) {
+    private HashMap<Pair, Double> generateSentenceComplete(ArrayList<ArrayList<Token>> lines) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
