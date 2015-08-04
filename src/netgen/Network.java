@@ -9,11 +9,10 @@ import java.util.Scanner;
 
 public class Network {
 
-    HashMap<Pair, Double> edges = new HashMap<>();
-    HashMap<Token, Integer> frequency = new HashMap<>();
+    public HashMap<Pair, Double> edges = new HashMap<>();
+
 
     public Network(ArrayList<ArrayList<Token>> tokenizedCorpus) {
-        this.frequency = getFrequencyMap(tokenizedCorpus);
         this.edges = generateSentenceComplete(tokenizedCorpus);
     }
 
@@ -21,7 +20,7 @@ public class Network {
     //Returns the sum of all of these graphs
     //Tokens will never be linked to identical tokens.
     //Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> generateSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
+    private static HashMap<Pair, Double> generateSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
@@ -43,10 +42,11 @@ public class Network {
         return network;
     }
 
+    
     //Forms a complete graph of every line and returns the sum of all of these graphs
     //Tokens will never be linked to themselves.
     //Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
-    private HashMap<Pair, Double> generateSentenceComplete(ArrayList<ArrayList<Token>> lines) {
+    private static HashMap<Pair, Double> generateSentenceComplete(ArrayList<ArrayList<Token>> lines) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
@@ -65,29 +65,13 @@ public class Network {
         }
         return network;
     }
-
-    //Counts the number of occurrences of each unique token in the corpus
-    private HashMap<Token, Integer> getFrequencyMap(ArrayList<ArrayList<Token>> lines) {
-
-        HashMap<Token, Integer> count = new HashMap<>();
-
-        for (ArrayList<Token> tokens : lines) {
-            for (int i = 0; i < tokens.size(); i++) {
-                if (count.containsKey(tokens.get(i))) {
-                    int value = count.get(tokens.get(i)) + 1;
-                    count.put(tokens.get(i), value);
-                } else {
-                    count.put(tokens.get(i), 1);
-                }
-            }
-        }
-
-        return count;
-    }
-
+    
+    
     //Writes the graph to an .dl file, weighted edge list format
     public void writeEdgelist(String fileName) {
 
+//        System.out.println("Writing edgelist...");
+        
         ArrayList<Pair> unfilteredEdgeList = new ArrayList<>();
         ArrayList<Pair> edgeList = new ArrayList<>();
         unfilteredEdgeList.addAll(edges.keySet());
@@ -101,14 +85,15 @@ public class Network {
         System.out.println("Filtered edges: " + edgeList.size());
 
         try {
-            File file = new File(fileName);
+            File file = new File(fileName + ".dl");
             FileWriter writer = null;
             writer = new FileWriter(file);
             writer.write("dl\nformat = edgelist1\t\nn=" + edges.size() + "\t\ndata:");
 
             for (Pair pair : edgeList) {
                 writer.write("\n" + pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
-                System.out.println(pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
+                //Debug
+//                System.out.println(pair.getA().getSignature() + " " + pair.getB().getSignature() + " " + edges.get(pair) + "\t");
             }
             
             writer.close();
