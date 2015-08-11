@@ -41,6 +41,10 @@ public class Token {
         return signature.hashCode();
     }
     
+    @Override
+    public Token clone() {
+        return new Token(this.signature);
+    }
     
     public void print() {
         System.out.print(this.signature + " ");

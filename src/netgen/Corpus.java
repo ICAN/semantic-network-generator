@@ -1,14 +1,10 @@
 package netgen;
 
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import porter.Stemmer;
-import java.lang.String;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Corpus {
@@ -20,133 +16,24 @@ public class Corpus {
     private String title;
     private String link;
 //    public HashMap<String, String> attributes;
-//    HashMap<Token, Integer> frequency = new HashMap<>();
+    private HashMap<Token, Integer> tokenFrequency;
+    private HashSet<Token> stopwords;
+    private Stemmer stemmer;
 
-    //CONSTRUCTORS
+    //CONSTRUCTORS & ASSOCIATED METHODS
     public Corpus(String text) {
         rawText = text.trim();
 //        attributes = new HashMap<String, String>();
-        processedText = new ArrayList<>();
         title = "";
         link = "";
         date = "";
         summary = "";
     }
 
-    //IMPORT METHODS
-    //Reads a file & returns each line in the file as a string in an arraylist
-    public static ArrayList<String> readFileAsLines(String fileName) {
-        ArrayList<String> lines = new ArrayList<>();
-        Scanner inFile = null;
-
-        try {
-            inFile = new Scanner(new FileReader(fileName));
-        } catch (Exception e) {
-            System.out.println("Failed to open input file. Exiting.");
-            System.exit(-1);
-        }
-
-        while (inFile.hasNextLine()) {
-            lines.add(inFile.nextLine());
-        }
-        return lines;
-    }
-
-    //Reads the specified file then combines its lines into a single string using combine() method
-    public static String readFileAsString(String fileName) {
-        return combine(readFileAsLines(fileName));
-    }
-
-    //Reads a text file, tokenizes it, and returns a set of those tokens
-    public static HashSet<Token> importStopwords(String fileName) {
-        HashSet<Token> stopTokens = new HashSet<>();
-        ArrayList<String> lines = readFileAsLines(fileName);
-        for (String line : lines) {
-            stopTokens.addAll(Corpus.getTokenized(line));
-        }
-
-        return stopTokens;
-    }
-
-    //Combines the lines of the lines of the arraylist into a single String, separated by newline characters
-    public static String combine(ArrayList<String> lines) {
-        String condensed = "";
-        for (String line : lines) {
-            condensed += ("\n" + line);
-        }
-        return condensed;
-    }
-
-    //Produces an arraylist of KTUU, ADN or Homer Tribune corpora 
-    //from unprocessed lines of text
-    public static ArrayList<Corpus> getCorpora(ArrayList<String> lines, String mode) {
-
-        ArrayList<Corpus> corpora = new ArrayList<>();
-        ArrayList<String> rows = new ArrayList<>();
-        ArrayList<String> fields = new ArrayList<>();
-
-        String combinedLines = combine(lines);
-
-        rows.addAll(Arrays.asList(combinedLines.split("<ROW>")));
-
-        for (String row : rows) {
-            fields.addAll(Arrays.asList(row.split("<COL>")));
-        }
-
-        //debug
-//        System.out.println("Fields: " + fields.size());
-//
-//        int count = 1;
-//        for (String field : fields) {
-//            System.out.println("Field " + count + ": " + field);
-//            count++;
-//        }
-        if (mode.equalsIgnoreCase("adn")) {
-
-            //in DB dump: Article, Link, Title, Date
-            for (int i = 3; i < fields.size(); i += 4) {
-                Corpus corpus = new Corpus(fields.get(i - 3));
-                corpus.setLink(fields.get(i - 2));
-                corpus.setTitle(fields.get(i - 1));
-                corpus.setDate(fields.get(i));
-                corpora.add(corpus);
-            }
-
-        } else if (mode.equalsIgnoreCase("ktuu")) {
-
-            //in DB dump: Link, Summary, Article, Title, Date
-            for (int i = 4; i < fields.size(); i += 5) {
-                Corpus corpus = new Corpus(fields.get(i - 2));
-                corpus.setDate(fields.get(i));
-                corpus.setLink(fields.get(i - 4));
-                corpus.setSummary(fields.get(i - 3));
-                corpus.setTitle(fields.get(i - 1));
-                corpora.add(corpus);
-            }
-
-        } else if (mode.equalsIgnoreCase("tribune")) {
-
-            //in DB dump: Link, Article, Title, Date
-            for (int i = 3; i < fields.size(); i += 4) {
-                Corpus corpus = new Corpus(fields.get(i - 2));
-                corpus.setLink(fields.get(i - 3));
-                corpus.setTitle(fields.get(i - 1));
-                corpus.setDate(fields.get(i));
-                corpora.add(corpus);
-            }
-
-        } else {
-            System.out.println("Unrecognized type of input file");
-            System.exit(-1);
-        }
-
-        return corpora;
-    }
-
-    //CORPUS PARSING AND FILTERING METHODS
+    //CORPUS PROCESSING METHODS
     //Splits corpus into strings consisting of complete sentences
     //Spltis on both periods and semicolons
-    public static ArrayList<String> getSentences(ArrayList<String> corpus) {
+    private static ArrayList<String> splitSentences(ArrayList<String> corpus) {
         ArrayList<String> sentences = new ArrayList<>();
 
         //TODO: ADD PREFILTERING FOR UNWANTED SPECIAL CHARACTERS
@@ -177,25 +64,25 @@ public class Corpus {
     }
 
     //Modified version which takes a single string
-    public static ArrayList<String> getSentences(String corpus) {
+    private static ArrayList<String> splitSentences(String corpus) {
         ArrayList<String> list = new ArrayList<String>(1);
         list.add(corpus);
-        return Corpus.getSentences(list);
+        return Corpus.splitSentences(list);
     }
 
     //Modified version which takes an ArrayList of strings
-    public static ArrayList<ArrayList<Token>> getTokenized(ArrayList<String> input) {
+    private static ArrayList<ArrayList<Token>> tokenize(ArrayList<String> input) {
         ArrayList<ArrayList<Token>> output = new ArrayList<>();
 
         for (String line : input) {
-            output.add(Corpus.getTokenized(line));
+            output.add(Corpus.tokenize(line));
         }
         return output;
     }
 
     //Takes a filtered sentence and returns its contents as a list of tokens
     //Possible alternative: return a token set rather than a token list?
-    public static ArrayList<Token> getTokenized(String input) {
+    private static ArrayList<Token> tokenize(String input) {
         ArrayList<Token> sentence = new ArrayList<>();
         String[] split = input.split("\\s+");
         for (String word : split) {
@@ -208,8 +95,9 @@ public class Corpus {
     }
 
     //Eliminates duplicates from a list of tokens
+    //NOTE: The list may no longer be in the same order
     //TODO: There's probably a faster & less offensive way to do this
-    public static void removeDuplicates(ArrayList<Token> tokenlist) {
+    private static void removeDuplicates(ArrayList<Token> tokenlist) {
         HashSet<Token> tokenset = new HashSet<>();
         tokenset.addAll(tokenlist);
         tokenlist = new ArrayList<>();
@@ -217,81 +105,87 @@ public class Corpus {
     }
 
     //Filters out everything but spaces, letters
-    //Trims and converts to lower-case
-    public static String getFilteredString(String input) {
+    //Trims and converts letters to lower-case
+    private static String makeFilteredString(String input) {
         return input.replaceAll("[^a-zA-Z ]", " ").toLowerCase().trim();
     }
 
     //Filters out everything but spaces, letters
     //Trims and converts to lower-case
-    public static ArrayList<String> getFilteredStrings(ArrayList<String> input) {
+    private static ArrayList<String> makeFilteredStrings(ArrayList<String> input) {
         ArrayList<String> output = new ArrayList<>();
         for (String line : input) {
-            output.add(Corpus.getFilteredString(line));
+            output.add(Corpus.makeFilteredString(line));
         }
         return output;
     }
 
-    //Removes stopwords from input list of lists of tokens
-    public static void removeStopwords(ArrayList<ArrayList<Token>> input, HashSet<Token> stopwords) {
-        for (ArrayList<Token> sentence : input) {
-            sentence.removeAll(stopwords);
+    //Removes stopwords from this processed text
+    private void removeStopwords() {
+        for (ArrayList<Token> sentence : this.processedText) {
+            sentence.removeAll(this.stopwords);
         }
     }
 
-    //Removes stopwords from this processed text
-    public void removeStopwords(HashSet<Token> stopwords) {
-        removeStopwords(this.getProcessedText(), stopwords);
+    private void generateFrequencyMap() {
+        HashMap<Token, Integer> map = new HashMap<>();
+
+        for (ArrayList<Token> tokens : this.processedText) {
+            for (int i = 0; i < tokens.size(); i++) {
+                if (map.containsKey(tokens.get(i))) {
+                    int value = map.get(tokens.get(i)) + 1;
+                    map.put(tokens.get(i), value);
+                } else {
+                    map.put(tokens.get(i), 1);
+                }
+            }
+        }
+        this.tokenFrequency = map;
     }
 
-    //Processes this corpus
-    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
-        this.setProcessedText(Corpus.getProcessedText(this.getRawText(), stemmer, stopwords));
-    }
+    //Processes the rawText into the filtered, split, tokenized processedText
+    private void processText() {
+        ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
+        this.stopwords = stopwords;
+        this.removeStopwords();
 
-    public static ArrayList<ArrayList<Token>> getProcessedText(String rawText, Stemmer stemmer, HashSet<Token> stopwords) {
-        ArrayList<ArrayList<Token>> processedText = getTokenized(getFilteredStrings(getSentences(rawText)));
-        removeStopwords(processedText, stopwords);
-
-        for (ArrayList<Token> line : processedText) {
+        for (ArrayList<Token> line : processed) {
             for (Token token : line) {
                 token.setSignature(stemmer.stem(token.getSignature()));
             }
         }
-
-        return processedText;
+        this.processedText = processed;
     }
 
-    //Counts the number of occurrences of each unique token in the corpus
-    private HashMap<Token, Integer> getFrequencyMap(ArrayList<ArrayList<Token>> lines) {
+    //Conducts all processing activities on the corpus
+    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
+        this.stemmer = stemmer;
+        this.stopwords = stopwords;
+        this.processText();
+        this.generateFrequencyMap();
 
-        HashMap<Token, Integer> count = new HashMap<>();
-
-        for (ArrayList<Token> tokens : lines) {
-            for (int i = 0; i < tokens.size(); i++) {
-                if (count.containsKey(tokens.get(i))) {
-                    int value = count.get(tokens.get(i)) + 1;
-                    count.put(tokens.get(i), value);
-                } else {
-                    count.put(tokens.get(i), 1);
-                }
-            }
-        }
-        return count;
     }
 
-    private HashMap<Token, Integer> getFrequencyMap() {
-        return getFrequencyMap(this.getProcessedText());
-    }
-    
     //ACCESSORS AND MUTATORS
-
     public String getDate() {
         return date;
     }
 
+    public HashSet<Token> getTokenSet() {
+        return (HashSet<Token>) this.tokenFrequency.keySet();
+    }
+
+    //Returns the number of tokens in the processed text
+    public int getTokenizedSize() {
+        int count = 0;
+        for (ArrayList<Token> sentence : this.processedText) {
+            count += sentence.size();
+        }
+        return count;
+    }
+
     //Accepts only YYYY-MM-DD format
-    //Exits if provided nonmatching string
+    //Warns & sets to "UNKOWN DATE" if provided nonmatching string
     public void setDate(String date) {
         date = date.trim();
         if (date.matches("[0-9]{4}(-[0-9]{2}){2}")) {
@@ -332,16 +226,6 @@ public class Corpus {
 
     }
 
-    public HashSet<Token> getTokenSet() {
-        HashSet<Token> tokens = new HashSet<>();
-        for (ArrayList<Token> sentence : this.getProcessedText()) {
-            for (Token token : sentence) {
-                tokens.add((token));
-            }
-        }
-        return tokens;
-    }
-
     public String getRawText() {
         return rawText;
     }
@@ -358,17 +242,20 @@ public class Corpus {
         this.processedText = processedText;
     }
 
+    public void setStopwords(HashSet<Token> stopwords) {
+        this.stopwords = stopwords;
+    }
+
     //MAIN METHOD
-    
     public static void main(String[] args) {
 
         String name = "adn";
         Stemmer stemmer = new Stemmer();
-        HashSet<Token> stopwords = Corpus.importStopwords("stopwords_long.txt");
-        ArrayList<String> input = readFileAsLines(name + ".csv");
+        HashSet<Token> stopwords = new HashSet<>();
+        stopwords.addAll(Corpus.tokenize(IO.readFileAsString("stopwords_long.txt")));
 
-        System.out.println("Splitting into corpora");
-        ArrayList<Corpus> corpora = getCorpora(input, name);
+        System.out.println("Importing and splitting into corpora");
+        ArrayList<Corpus> corpora = IO.importCorpora(IO.readFileAsLines(name + ".csv"), name);
         System.out.println("Split into " + corpora.size() + " corpora");
 
 //        Corpus corpus = corpora.get(115);
@@ -379,8 +266,8 @@ public class Corpus {
 //        for(int i = 120; i < corpus.rawText.length(); i+= 120) {
 //            System.out.println(corpus.rawText.substring(i-120, i));
 //        }
-            ArrayList<String> sentences = Corpus.getSentences(corpus.getRawText());
-            Corpus.getFilteredStrings(sentences);
+            ArrayList<String> sentences = Corpus.splitSentences(corpus.getRawText());
+            Corpus.makeFilteredStrings(sentences);
 
 //            System.out.println("Sentences: ");
 //            for (String sentence : sentences) {
