@@ -70,38 +70,51 @@ public class Network {
     }
     
     
-    public void filterEdges(int absoluteMinimumEdges, double proportionalMinimumEdges) {
+    public void filterEdges(double proportionalMin, int absoluteMin) {
         
-        double totalCount = edges.size();
-        double cumulativeCount = 0;
+        double originalSize = edges.size();
+        double minWeight = 0;
         
-        for(int weight = 1; weight < 10; weight++) {
-            double frequency = 0;
-            for(Entry<Pair, Double> edge : edges.entrySet()) {
-                if(edge.getValue() <= weight) {
-                    frequency++;
-                }
-            }    
-            cumulativeCount += frequency;
+        
+        
+        //Find cutoff
+        while (minWeight < 10) {
+            double edgesToCut = 0;
             
-            //If removing edges in the current weight class will not result in
-            //too few edges (absolute or proportional), then remove all edges 
-            //in the current weight class
-            if(cumulativeCount/totalCount < (1 - absoluteMinimumEdges) 
-                    && totalCount - cumulativeCount > proportionalMinimumEdges) {
-                
-                for(Entry<Pair, Double> edge : edges.entrySet()) {
-                    if(edge.getValue() <= weight) {
-                        edges.remove(edge.getKey());
-                    }    
+            for(Entry<Pair, Double> edge : edges.entrySet()) {
+                if(edge.getValue() <= minWeight) {
+                    edgesToCut++;
                 }
+            }
+            
+            System.out.println("Found " + edgesToCut + " edges under weight " + minWeight + " out of " + originalSize + " edges.");
+            
+            if((originalSize - edgesToCut)/originalSize > proportionalMin 
+                    && (originalSize - edgesToCut) > absoluteMin) {
+                minWeight++;
+                
             //Otherwise we're done removing edges
             } else {
                 break;                
             }
         }
-        System.out.println("Unfiltered edges: " + totalCount);
+        
+        System.out.println("Minimum edge weight: " + minWeight);
+        //If there is a valid weight threshold, replace the current edge set with
+        //an edge set consisting only of edges with weights above the threshold
+        if (minWeight > 0) {
+            HashMap<Pair, Double> retainedEdges = new HashMap<>();
+            for(Entry<Pair, Double> entry : edges.entrySet()) {
+                if(entry.getValue() >= minWeight) {
+                    retainedEdges.put(entry.getKey(), entry.getValue());
+                }
+            }
+            edges = retainedEdges;
+        }
+        
+        System.out.println("Unfiltered edges: " + originalSize);
         System.out.println("Filtered edges: " + edges.size());
+        
         
     }
     

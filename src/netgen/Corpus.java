@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import porter.Stemmer;
 import java.util.HashMap;
 
-public class Corpus {
+public class Corpus implements Comparable {
 
     private String rawText;
     private ArrayList<ArrayList<Token>> processedText;
@@ -17,7 +17,7 @@ public class Corpus {
     private String link;
 //    public HashMap<String, String> attributes;
     private HashMap<Token, Integer> tokenFrequency;
-    private HashSet<Token> stopwords;
+    public HashSet<Token> stopwords;
     private Stemmer stemmer;
 
     //CONSTRUCTORS & ASSOCIATED METHODS
@@ -146,8 +146,7 @@ public class Corpus {
     //Processes the rawText into the filtered, split, tokenized processedText
     private void processText() {
         ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
-        this.stopwords = stopwords;
-        this.removeStopwords();
+        
 
         for (ArrayList<Token> line : processed) {
             for (Token token : line) {
@@ -155,6 +154,7 @@ public class Corpus {
             }
         }
         this.processedText = processed;
+        this.removeStopwords();
     }
 
     //Conducts all processing activities on the corpus
@@ -172,7 +172,9 @@ public class Corpus {
     }
 
     public HashSet<Token> getTokenSet() {
-        return (HashSet<Token>) this.tokenFrequency.keySet();
+        HashSet<Token> tokenSet = new HashSet<>();
+        tokenSet.addAll(tokenFrequency.keySet());
+        return tokenSet;
     }
 
     //Returns the number of tokens in the processed text
@@ -226,6 +228,41 @@ public class Corpus {
 
     }
 
+    @Override
+    public int compareTo(Object other) throws NullPointerException, ClassCastException {
+        if(other == null) {
+            throw new NullPointerException();
+        } 
+        if (!other.getClass().equals(this.getClass())) {
+            throw new ClassCastException();
+        }
+        Corpus otherCorpus = (Corpus) other;
+             
+        int myYear = Integer.parseInt(date.substring(0, 3));
+        int otherYear = Integer.parseInt(otherCorpus.getDate().substring(0, 3));
+        int myMonth = Integer.parseInt(date.substring(5, 6));
+        int otherMonth = Integer.parseInt(otherCorpus.getDate().substring(5, 6));
+        int myDay = Integer.parseInt(date.substring(8, 9));
+        int otherDay = Integer.parseInt(otherCorpus.getDate().substring(8, 9));
+        
+        if(myYear > otherYear) {
+            return 1;
+        } else if (myYear < otherYear) {
+            return -1;
+        } else if (myMonth > otherMonth) {
+            return 1;
+        } else if (myMonth < otherMonth) {
+            return -1;
+        } else if (myDay > otherDay) {
+            return 1;
+        } else if (myDay < otherDay) {
+            return -1;
+        } else {
+            return 0;
+        }
+        
+    }
+    
     public String getRawText() {
         return rawText;
     }
@@ -249,7 +286,7 @@ public class Corpus {
     //MAIN METHOD
     public static void main(String[] args) {
 
-        String name = "adn";
+        String name = "tribune";
         Stemmer stemmer = new Stemmer();
         HashSet<Token> stopwords = new HashSet<>();
         stopwords.addAll(Corpus.tokenize(IO.readFileAsString("stopwords_long.txt")));
@@ -258,39 +295,30 @@ public class Corpus {
         ArrayList<Corpus> corpora = IO.importCorpora(IO.readFileAsLines(name + ".csv"), name);
         System.out.println("Split into " + corpora.size() + " corpora");
 
-//        Corpus corpus = corpora.get(115);
+        corpora.sort(null);
+        int i = 0;
         for (Corpus corpus : corpora) {
+            
             corpus.process(stemmer, stopwords);
 
-//        System.out.println("Raw text: ");
-//        for(int i = 120; i < corpus.rawText.length(); i+= 120) {
-//            System.out.println(corpus.rawText.substring(i-120, i));
-//        }
-            ArrayList<String> sentences = Corpus.splitSentences(corpus.getRawText());
-            Corpus.makeFilteredStrings(sentences);
-
-//            System.out.println("Sentences: ");
-//            for (String sentence : sentences) {
-//                System.out.println(sentence);
-//            }
             System.out.println("Unique tokens: " + corpus.getTokenSet().size());
 
             System.out.println("Tokenized Sentences: " + corpus.getProcessedText().size());
-//            for (ArrayList<Token> sentence : corpus.processedText) {
-//                for (Token token : sentence) {
-//                    token.print();
-//                }
-//                System.out.println();
-//            }
 
             Network network = new Network(corpus.getProcessedText());
             System.out.println("Created network");
-            int end = corpus.title.length();
-            if (end > 30) {
-                end = 30;
-            }
-            network.writeEdgelist(name + "." + corpus.date + "." + corpus.title.substring(0, end));
+            
+//            int end = corpus.title.length();
+//            if (end > 30) {
+//                end = 30;
+//            }
+            network.filterEdges(.01, 20);
+            network.writeEdgelist("" + i);
+            i++;
         }
+        
+        
+        
 
     }
 
