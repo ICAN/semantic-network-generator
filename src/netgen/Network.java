@@ -14,16 +14,19 @@ public class Network {
     public double minimumWeight = 0;
 
     public Network(ArrayList<ArrayList<Token>> tokenizedCorpus) {
-        this.edges = generateSentenceCompleteNetwork(tokenizedCorpus);
+        this.edges = generateBySingleSentenceWindow(tokenizedCorpus);
     }
 
+    
+    //NETWORK GENERATION METHODS
+    
     /*
      Forms a complete graph of a window which slides through each line. Returns the sum of all of these graphs. 
      Tokens will never be linked to themselves (so multiple instances of a token in a sentence will not result in reflexive edges).
      Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
      */
     //TODO: Fix
-    private static HashMap<Pair, Double> generateSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
+    private static HashMap<Pair, Double> generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
@@ -46,7 +49,7 @@ public class Network {
     }
 
     //Multi-sentence-complete sliding window
-    private static HashMap<Pair, Double> generateMultiSentenceSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
+    private static HashMap<Pair, Double> generateByMultiSentenceSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         //For each window
@@ -62,7 +65,7 @@ public class Network {
             }
 
             //Generate and attenuate the network based on window size
-            HashMap<Pair, Double> windowNetwork = generateCompleteNetwork(windowTokens);
+            HashMap<Pair, Double> windowNetwork = networkSentence(windowTokens);
             for (Entry entry : windowNetwork.entrySet()) {
                 entry.setValue((double) entry.getValue() / (1 + windowNetwork.size()));
                 System.out.println("Value: " + entry.getValue());
@@ -82,23 +85,8 @@ public class Network {
         return network;
     }
 
-    private void modifyEdgeWeightByTokenIncidence(HashMap<Token, Double> weightMultipliers) {
-        for (Entry entry : edges.entrySet()) {
-            Token a = ((Pair) entry.getKey()).getA();
-            Token b = ((Pair) entry.getKey()).getA();
-
-            if (weightMultipliers.containsKey(a)) {
-                entry.setValue((double) entry.getValue() * weightMultipliers.get(a));
-            }
-
-            if (weightMultipliers.containsKey(b)) {
-                entry.setValue((double) entry.getValue() * weightMultipliers.get(b));
-            }
-        }
-    }
-
-    //
-    private static HashMap<Pair, Double> generateCompleteNetwork(ArrayList<Token> line) {
+    //Forms a complete graph of a single sentence
+    private static HashMap<Pair, Double> networkSentence (ArrayList<Token> line) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (int i = 0; i < line.size() - 1; i++) {
@@ -115,11 +103,13 @@ public class Network {
         }
         return network;
     }
-
-    //Forms a complete graph of every line and returns the sum of all of these graphs
-    //Tokens will never be linked to themselves.
-    //Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
-    private static HashMap<Pair, Double> generateSentenceCompleteNetwork(ArrayList<ArrayList<Token>> lines) {
+    
+    /*
+    Forms a complete graph of every line and returns the sum of all of these graphs
+    Tokens will never be linked to themselves.
+    Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
+    */
+    private static HashMap<Pair, Double> generateBySingleSentenceWindow(ArrayList<ArrayList<Token>> lines) {
         HashMap<Pair, Double> network = new HashMap<>();
 
         for (ArrayList<Token> line : lines) {
@@ -139,46 +129,89 @@ public class Network {
         return network;
     }
 
+    
+    //BASIC GRAPH METHODS
+    
+    //Returns a new graph which is sum of the two arguments
+    public static HashMap<Pair, Double> add(HashMap<Pair, Double> a, HashMap<Pair, Double> b) {
+        HashMap<Pair, Double> sum = new HashMap<>();
+
+        sum.putAll(a);
+
+        for (Entry entry : b.entrySet()) {
+            if (!sum.containsKey((Pair) entry.getKey())) {
+                sum.put((Pair) entry.getKey(), (double) entry.getValue());
+            } else {
+                sum.put((Pair) entry.getKey(), (double) entry.getValue() + sum.get((Pair) entry.getKey()));
+            }
+        }
+        return sum;
+    }
+
+    
+    //NETWORK MODIFIERS AND FILTERS
+    
+     private void modifyEdgeWeightByTokenIncidence(HashMap<Token, Double> weightMultipliers) {
+        for (Entry entry : edges.entrySet()) {
+            Token a = ((Pair) entry.getKey()).getA();
+            Token b = ((Pair) entry.getKey()).getA();
+
+            if (weightMultipliers.containsKey(a)) {
+                entry.setValue((double) entry.getValue() * weightMultipliers.get(a));
+            }
+
+            if (weightMultipliers.containsKey(b)) {
+                entry.setValue((double) entry.getValue() * weightMultipliers.get(b));
+            }
+        }
+    }
+    
+     
+     
     //Filters edges below a threshold such that the absolute 
     //and proportional minimum numbers of edges are retained
     //Works upward incrementally, so it's not great
-    public void filterEdgesSimple(int absoluteMinimumEdges, double proportionalMinimumEdges) {
+    //TODO: probably actually broken
+//    public void filterEdgesOld(int absoluteMinimumEdges, double proportionalMinimumEdges) {
+//
+//        double totalCount = edges.size();
+//        double cumulativeCount = 0;
+//
+//        for (int weight = 1; weight < 10; weight++) {
+//            double frequency = 0;
+//            for (Entry<Pair, Double> edge : edges.entrySet()) {
+//                if (edge.getValue() <= weight) {
+//                    frequency++;
+//                }
+//            }
+//            cumulativeCount += frequency;
+//
+//            //If removing edges in the current weight class will not result in
+//            //too few edges (absolute or proportional), then remove all edges 
+//            //in the current weight class
+//            if (cumulativeCount / totalCount < (1 - absoluteMinimumEdges)
+//                    && totalCount - cumulativeCount > proportionalMinimumEdges) {
+//
+//                for (Entry<Pair, Double> edge : edges.entrySet()) {
+//                    if (edge.getValue() <= weight) {
+//                        edges.remove(edge.getKey());
+//                    }
+//                }
+//                //Otherwise we're done removing edges
+//            } else {
+//                break;
+//            }
+//        }
+//        System.out.println("Unfiltered edges: " + totalCount);
+//        System.out.println("Filtered edges: " + edges.size());
+//
+//    }
 
-        double totalCount = edges.size();
-        double cumulativeCount = 0;
-
-        for (int weight = 1; weight < 10; weight++) {
-            double frequency = 0;
-            for (Entry<Pair, Double> edge : edges.entrySet()) {
-                if (edge.getValue() <= weight) {
-                    frequency++;
-                }
-            }
-            cumulativeCount += frequency;
-
-            //If removing edges in the current weight class will not result in
-            //too few edges (absolute or proportional), then remove all edges 
-            //in the current weight class
-            if (cumulativeCount / totalCount < (1 - absoluteMinimumEdges)
-                    && totalCount - cumulativeCount > proportionalMinimumEdges) {
-
-                for (Entry<Pair, Double> edge : edges.entrySet()) {
-                    if (edge.getValue() <= weight) {
-                        edges.remove(edge.getKey());
-                    }
-                }
-                //Otherwise we're done removing edges
-            } else {
-                break;
-            }
-        }
-        System.out.println("Unfiltered edges: " + totalCount);
-        System.out.println("Filtered edges: " + edges.size());
-
-    }
-
-    //TODO: Make this binary-searchy
-    public void filterEdgesImproved(int absoluteMinimumEdges, double proportionalMinimumEdges, double precision) {
+    /*
+        Finds an appropriate threshold within the specified level of precision, measured in edge weight
+        Removes all edges below that threshold
+    */
+    public void filterEdges(int absoluteMinimumEdges, double proportionalMinimumEdges, double precision) {
 
         //Find the heaviest edge
         double threshold = 0;
@@ -187,14 +220,14 @@ public class Network {
             if (edge.getValue() > threshold) {
                 threshold = edge.getValue();
             }
-            if(edge.getValue() < lowest) {
+            if (edge.getValue() < lowest) {
                 lowest = edge.getValue();
             }
         }
 
         //Set the threshold halfway between the lowest and highest weights
         //Set the incrementor to half that
-        threshold = (threshold + lowest)/2;
+        threshold = (threshold + lowest) / 2;
         double incrementor = threshold / 2;
         double originalSize = edges.size();
 
@@ -234,6 +267,8 @@ public class Network {
 
     }
 
+    //OUTPUT METHODS
+    
     //Writes the graph to an .dl file, weighted edge list format
     public void writeEdgelist(String fileName) {
 
