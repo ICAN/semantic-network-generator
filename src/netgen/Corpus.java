@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import porter.Stemmer;
 import java.util.HashMap;
 
-public class Corpus {
+public class Corpus implements Comparable {
 
+    //CLASS MEMBERS
     private String rawText;
     private ArrayList<ArrayList<Token>> processedText;
     private String date;
@@ -18,6 +18,7 @@ public class Corpus {
 //    public HashMap<String, String> attributes;
     private HashMap<Token, Integer> tokenFrequency;
     private HashSet<Token> stopwords;
+    private HashSet<Token> namedEntities;
     private Stemmer stemmer;
 
     //CONSTRUCTORS & ASSOCIATED METHODS
@@ -30,18 +31,17 @@ public class Corpus {
         summary = "";
     }
 
-    //CORPUS PROCESSING METHODS
+    
+    
+    //////////TEXT PROCESSING METHODS///////////
     //Splits corpus into strings consisting of complete sentences
-    //Spltis on both periods and semicolons
-    private static ArrayList<String> splitSentences(ArrayList<String> corpus) {
+    //Splits on both periods and semicolons
+    public static ArrayList<String> splitSentences(ArrayList<String> corpus) {
         ArrayList<String> sentences = new ArrayList<>();
 
-        //TODO: ADD PREFILTERING FOR UNWANTED SPECIAL CHARACTERS
-        //TODO: FIX POST-COMPLETION?
-        //TODO: Probably completely revamp this
         String preCompletion = "( ([A-Za-z0-9,]|\\#|-|'){2,}?)";
-        String completion = "(\\.|;|\\?|!)+";
-        String postCompletion = "((\\\"|\\\'|[0-9]| |\\z|$|\\n){0,3})";
+        String completion = "(\\.|;|\\?|!)+"; //Valid completion characters for a sentence; 1 or more required, any composition permitted
+        String postCompletion = "((\\\"|\\\'|[0-9]| |\\z|$|\\n){0,3})"; //Post-sentence characters permitted; extremely tolerant
 
         for (String line : corpus) {
             Pattern pattern = Pattern.compile(preCompletion + completion + postCompletion);
@@ -49,8 +49,10 @@ public class Corpus {
             int index = 0;
             while (m.find()) {
                 String s = line.substring(index, m.end());
-                if (!s.matches(".* (Mr|Mrs|Ms|Dr|Rev|Esq|Mass|Conn).( |,)") //Avoid matching on abbreviated titles
-                        && !s.matches(".*[0-9]+(\\.|,)[0-9]+ ")) //Avoid matching numerical information
+                if (!s.matches(".* (Mr|Mrs|Ms|Dr|Rev|Esq|Mass|Conn).( |,)") //Avoid matching on abbreviated titles 
+                        //TODO: Make this list of titles more comprehensive
+                        //TODO: 
+                        && !s.matches(".*[0-9]+(\\.|,)[0-9]+")) //Avoid matching decimal numbers
                 {
                     if (s.length() > 1) { //avoid adding empty sentences
                         sentences.add(s.trim());
@@ -63,15 +65,15 @@ public class Corpus {
         return sentences;
     }
 
-    //Modified version which takes a single string
-    private static ArrayList<String> splitSentences(String corpus) {
+    //Single string version of sentence splitter
+    public static ArrayList<String> splitSentences(String line) {
         ArrayList<String> list = new ArrayList<String>(1);
-        list.add(corpus);
+        list.add(line);
         return Corpus.splitSentences(list);
     }
 
     //Modified version which takes an ArrayList of strings
-    private static ArrayList<ArrayList<Token>> tokenize(ArrayList<String> input) {
+    public static ArrayList<ArrayList<Token>> tokenize(ArrayList<String> input) {
         ArrayList<ArrayList<Token>> output = new ArrayList<>();
 
         for (String line : input) {
@@ -82,7 +84,7 @@ public class Corpus {
 
     //Takes a filtered sentence and returns its contents as a list of tokens
     //Possible alternative: return a token set rather than a token list?
-    private static ArrayList<Token> tokenize(String input) {
+    public static ArrayList<Token> tokenize(String input) {
         ArrayList<Token> sentence = new ArrayList<>();
         String[] split = input.split("\\s+");
         for (String word : split) {
@@ -95,9 +97,8 @@ public class Corpus {
     }
 
     //Eliminates duplicates from a list of tokens
-    //NOTE: The list may no longer be in the same order
-    //TODO: There's probably a faster & less offensive way to do this
-    private static void removeDuplicates(ArrayList<Token> tokenlist) {
+    //NOTE: The returned list may no longer be in the same order
+    public static void removeDuplicates(ArrayList<Token> tokenlist) {
         HashSet<Token> tokenset = new HashSet<>();
         tokenset.addAll(tokenlist);
         tokenlist = new ArrayList<>();
@@ -106,28 +107,51 @@ public class Corpus {
 
     //Filters out everything but spaces, letters
     //Trims and converts letters to lower-case
-    private static String makeFilteredString(String input) {
+    public static String filterNonAlpha(String input) {
         return input.replaceAll("[^a-zA-Z ]", " ").toLowerCase().trim();
     }
 
     //Filters out everything but spaces, letters
     //Trims and converts to lower-case
-    private static ArrayList<String> makeFilteredStrings(ArrayList<String> input) {
+    public static ArrayList<String> makeFilteredStrings(ArrayList<String> input) {
         ArrayList<String> output = new ArrayList<>();
         for (String line : input) {
-            output.add(Corpus.makeFilteredString(line));
+            output.add(Corpus.filterNonAlpha(line));
         }
         return output;
     }
 
     //Removes stopwords from this processed text
-    private void removeStopwords() {
+    public void removeStopwords() {
         for (ArrayList<Token> sentence : this.processedText) {
             sentence.removeAll(this.stopwords);
         }
     }
 
-    private void generateFrequencyMap() {
+    //Tags stopwords as such
+    public void tagStopwords() {
+        for (ArrayList<Token> sentence : this.processedText) {
+            for (Token token : sentence) {
+                if (stopwords.contains(token)) {
+                    token.tag(Token.Tag.STOPWORD);
+                }
+            }
+        }
+    }
+
+    //TODO: 
+    //Need to figure out whether adjacent capitalized words are in fact distinct tokens/named entities
+//    private void tagNamedEntitiesREGEX() {
+//        //First pass: identify additional named entities in this context        
+//        for(ArrayList<Token> sentence : processedText) {
+//            for(int i = 0; i < sentence.size(); i++) {
+//                if()
+//            }
+//        }
+//        
+//        
+//    }
+    public void generateFrequencyMap() {
         HashMap<Token, Integer> map = new HashMap<>();
 
         for (ArrayList<Token> tokens : this.processedText) {
@@ -143,25 +167,26 @@ public class Corpus {
         this.tokenFrequency = map;
     }
 
-    //Processes the rawText into the filtered, split, tokenized processedText
-    private void processText() {
-        ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
+    //Conducts all processing activities on the corpus
+    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
+        //Set stemmer and stopwords
+        this.stemmer = stemmer;
         this.stopwords = stopwords;
-        this.removeStopwords();
+        
+        //Split on sentences, filter characters, and tokenize
+        ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
 
         for (ArrayList<Token> line : processed) {
             for (Token token : line) {
                 token.setSignature(stemmer.stem(token.getSignature()));
             }
         }
+        
         this.processedText = processed;
-    }
-
-    //Conducts all processing activities on the corpus
-    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
-        this.stemmer = stemmer;
-        this.stopwords = stopwords;
-        this.processText();
+        
+        //Filter stopwords, generate metadata
+        //TODO: switch to tagging stopwords?
+        this.removeStopwords();
         this.generateFrequencyMap();
 
     }
@@ -170,9 +195,12 @@ public class Corpus {
     public String getDate() {
         return date;
     }
-
+    
+    //Returns a set of all unique tokens in the corpus
     public HashSet<Token> getTokenSet() {
-        return (HashSet<Token>) this.tokenFrequency.keySet();
+        HashSet<Token> tokenSet = new HashSet<>();
+        tokenSet.addAll(tokenFrequency.keySet());
+        return tokenSet;
     }
 
     //Returns the number of tokens in the processed text
@@ -226,6 +254,41 @@ public class Corpus {
 
     }
 
+    @Override
+    public int compareTo(Object other) throws NullPointerException, ClassCastException {
+        if (other == null) {
+            throw new NullPointerException();
+        }
+        if (!other.getClass().equals(this.getClass())) {
+            throw new ClassCastException();
+        }
+        Corpus otherCorpus = (Corpus) other;
+
+        int myYear = Integer.parseInt(date.substring(0, 3));
+        int otherYear = Integer.parseInt(otherCorpus.getDate().substring(0, 3));
+        int myMonth = Integer.parseInt(date.substring(5, 6));
+        int otherMonth = Integer.parseInt(otherCorpus.getDate().substring(5, 6));
+        int myDay = Integer.parseInt(date.substring(8, 9));
+        int otherDay = Integer.parseInt(otherCorpus.getDate().substring(8, 9));
+
+        if (myYear > otherYear) {
+            return 1;
+        } else if (myYear < otherYear) {
+            return -1;
+        } else if (myMonth > otherMonth) {
+            return 1;
+        } else if (myMonth < otherMonth) {
+            return -1;
+        } else if (myDay > otherDay) {
+            return 1;
+        } else if (myDay < otherDay) {
+            return -1;
+        } else {
+            return 0;
+        }
+
+    }
+
     public String getRawText() {
         return rawText;
     }
@@ -246,52 +309,7 @@ public class Corpus {
         this.stopwords = stopwords;
     }
 
-    //MAIN METHOD
-    public static void main(String[] args) {
-
-        String name = "adn";
-        Stemmer stemmer = new Stemmer();
-        HashSet<Token> stopwords = new HashSet<>();
-        stopwords.addAll(Corpus.tokenize(IO.readFileAsString("stopwords_long.txt")));
-
-        System.out.println("Importing and splitting into corpora");
-        ArrayList<Corpus> corpora = IO.importCorpora(IO.readFileAsLines(name + ".csv"), name);
-        System.out.println("Split into " + corpora.size() + " corpora");
-
-//        Corpus corpus = corpora.get(115);
-        for (Corpus corpus : corpora) {
-            corpus.process(stemmer, stopwords);
-
-//        System.out.println("Raw text: ");
-//        for(int i = 120; i < corpus.rawText.length(); i+= 120) {
-//            System.out.println(corpus.rawText.substring(i-120, i));
-//        }
-            ArrayList<String> sentences = Corpus.splitSentences(corpus.getRawText());
-            Corpus.makeFilteredStrings(sentences);
-
-//            System.out.println("Sentences: ");
-//            for (String sentence : sentences) {
-//                System.out.println(sentence);
-//            }
-            System.out.println("Unique tokens: " + corpus.getTokenSet().size());
-
-            System.out.println("Tokenized Sentences: " + corpus.getProcessedText().size());
-//            for (ArrayList<Token> sentence : corpus.processedText) {
-//                for (Token token : sentence) {
-//                    token.print();
-//                }
-//                System.out.println();
-//            }
-
-            Network network = new Network(corpus.getProcessedText());
-            System.out.println("Created network");
-            int end = corpus.title.length();
-            if (end > 30) {
-                end = 30;
-            }
-            network.writeEdgelist(name + "." + corpus.date + "." + corpus.title.substring(0, end));
-        }
-
-    }
+    //
+    
 
 }

@@ -2,3 +2,6 @@
 /src/netgen/dbconn.java
 /src/netgen/Database.java
 /dist/
+/build/
+/nbproject/
+/src/netgen/RegexNER.java

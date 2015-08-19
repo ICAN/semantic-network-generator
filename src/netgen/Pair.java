@@ -1,6 +1,7 @@
 
 package netgen;
 
+//Composed of two tokens; used to form edges in a semantic network
 public class Pair {
     private Token a;
     private Token b;

@@ -1,4 +1,4 @@
-package lancaster;
+package netgen;
 
 /*	Please see the license information in the header below. */
 import java.io.*;
@@ -38,7 +38,7 @@ import java.util.*;
  *
  *
  */
-public class Stemmer {
+public class LancasterStemmer implements Stemmer {
 
     /**
      * Prefixes to remove from words before stemming.
@@ -218,7 +218,7 @@ public class Stemmer {
      * characters.
      * </p>
      */
-    public Stemmer() {
+    public LancasterStemmer() {
         this.preStrip = true;
 
         loadRules(defaultStemmingRules);
@@ -234,7 +234,7 @@ public class Stemmer {
      * characters.
      * </p>
      */
-    public Stemmer(String[] rules) {
+    public LancasterStemmer(String[] rules) {
         this.preStrip = true;
 
         loadRules(rules);
@@ -252,7 +252,7 @@ public class Stemmer {
      * characters.
      * </p>
      */
-    public Stemmer(String[] rules, boolean preStrip) {
+    public LancasterStemmer(String[] rules, boolean preStrip) {
         this.preStrip = preStrip;
 
         loadRules(rules);
@@ -689,6 +689,7 @@ public class Stemmer {
      *
      * @return	The stemmed string.
      */
+    @Override
     public String stem(String s) {
         //	Copy input string to be stemmed.
 

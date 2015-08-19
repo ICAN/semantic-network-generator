@@ -1,4 +1,4 @@
-package porter;
+package netgen;
 /*
 
  Porter stemmer in Java. The original paper is in
@@ -41,7 +41,7 @@ import java.io.*;
  * provided a character at time (by calling add()), or at once by calling one of
  * the various stem(something) methods.
  */
-public class Stemmer {
+public class PorterStemmer implements Stemmer {
 
     private char[] b;
     private int i, /* offset into b */
@@ -50,7 +50,7 @@ public class Stemmer {
     private static final int INC = 50;
     /* unit of size whereby b is increased */
 
-    public Stemmer() {
+    public PorterStemmer() {
         b = new char[INC];
         i = 0;
         i_end = 0;
@@ -96,6 +96,7 @@ public class Stemmer {
     }
     
     //Returns the stemmed word
+    @Override
     public String stem(String word) {
         add(word.toCharArray(), word.length());
         stem();
@@ -111,6 +112,7 @@ public class Stemmer {
      * reference to the internal buffer can be retrieved by getResultBuffer and
      * getResultLength (which is generally more efficient.)
      */
+    @Override
     public String toString() {
         return new String(b, 0, i_end);
     }
