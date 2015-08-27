@@ -1,21 +1,22 @@
 package netgen;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
 
-public class Corpus implements Comparable {
+public class Corpus implements ChronologicallyComparable {
 
     //CLASS MEMBERS
     private String rawText;
     private ArrayList<ArrayList<Token>> processedText;
-    private String date;
+    private Calendar calendar;
     private String summary;
     private String title;
     private String link;
-//    public HashMap<String, String> attributes;
     private HashMap<Token, Integer> tokenFrequency;
     private HashSet<Token> stopwords;
     private HashSet<Token> namedEntities;
@@ -24,15 +25,12 @@ public class Corpus implements Comparable {
     //CONSTRUCTORS & ASSOCIATED METHODS
     public Corpus(String text) {
         rawText = text.trim();
-//        attributes = new HashMap<String, String>();
+        calendar = Calendar.getInstance();
         title = "";
         link = "";
-        date = "";
         summary = "";
     }
 
-    
-    
     //////////TEXT PROCESSING METHODS///////////
     //Splits corpus into strings consisting of complete sentences
     //Splits on both periods and semicolons
@@ -139,18 +137,7 @@ public class Corpus implements Comparable {
         }
     }
 
-    //TODO: 
-    //Need to figure out whether adjacent capitalized words are in fact distinct tokens/named entities
-//    private void tagNamedEntitiesREGEX() {
-//        //First pass: identify additional named entities in this context        
-//        for(ArrayList<Token> sentence : processedText) {
-//            for(int i = 0; i < sentence.size(); i++) {
-//                if()
-//            }
-//        }
-//        
-//        
-//    }
+    
     public void generateFrequencyMap() {
         HashMap<Token, Integer> map = new HashMap<>();
 
@@ -172,7 +159,7 @@ public class Corpus implements Comparable {
         //Set stemmer and stopwords
         this.stemmer = stemmer;
         this.stopwords = stopwords;
-        
+
         //Split on sentences, filter characters, and tokenize
         ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
 
@@ -181,9 +168,9 @@ public class Corpus implements Comparable {
                 token.setSignature(stemmer.stem(token.getSignature()));
             }
         }
-        
+
         this.processedText = processed;
-        
+
         //Filter stopwords, generate metadata
         //TODO: switch to tagging stopwords?
         this.removeStopwords();
@@ -192,10 +179,6 @@ public class Corpus implements Comparable {
     }
 
     //ACCESSORS AND MUTATORS
-    public String getDate() {
-        return date;
-    }
-    
     //Returns a set of all unique tokens in the corpus
     public HashSet<Token> getTokenSet() {
         HashSet<Token> tokenSet = new HashSet<>();
@@ -203,7 +186,7 @@ public class Corpus implements Comparable {
         return tokenSet;
     }
 
-    //Returns the number of tokens in the processed text
+    //Returns the total number of tokens in the processed text
     public int getTokenizedSize() {
         int count = 0;
         for (ArrayList<Token> sentence : this.processedText) {
@@ -212,15 +195,28 @@ public class Corpus implements Comparable {
         return count;
     }
 
+    public int getMonth() {
+        return calendar.get(Calendar.MONTH);
+    }
+    
+    public int getDayOfMonth() {
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+    
+    public int getYear() {
+        return calendar.get(Calendar.YEAR);
+    }
+    
     //Accepts only YYYY-MM-DD format
     //Warns & sets to "UNKOWN DATE" if provided nonmatching string
     public void setDate(String date) {
-        date = date.trim();
-        if (date.matches("[0-9]{4}(-[0-9]{2}){2}")) {
-            this.date = date;
+        if (date.trim().matches("[0-9]{4}(-[0-9]{2}){2}")) {
+            this.calendar.set(Integer.parseInt(date.substring(0, 3)),
+                    Integer.parseInt(date.substring(5, 6)),
+                    Integer.parseInt(date.substring(8, 9)));
         } else {
+            this.calendar.set(0, 0, 0);
             System.out.println("Date? " + date);
-            this.date = "UNKNOWN DATE";
         }
     }
 
@@ -251,44 +247,14 @@ public class Corpus implements Comparable {
         if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
             System.out.println("Link? " + this.link);
         }
-
     }
 
     @Override
-    public int compareTo(Object other) throws NullPointerException, ClassCastException {
-        if (other == null) {
-            throw new NullPointerException();
-        }
-        if (!other.getClass().equals(this.getClass())) {
-            throw new ClassCastException();
-        }
-        Corpus otherCorpus = (Corpus) other;
-
-        int myYear = Integer.parseInt(date.substring(0, 3));
-        int otherYear = Integer.parseInt(otherCorpus.getDate().substring(0, 3));
-        int myMonth = Integer.parseInt(date.substring(5, 6));
-        int otherMonth = Integer.parseInt(otherCorpus.getDate().substring(5, 6));
-        int myDay = Integer.parseInt(date.substring(8, 9));
-        int otherDay = Integer.parseInt(otherCorpus.getDate().substring(8, 9));
-
-        if (myYear > otherYear) {
-            return 1;
-        } else if (myYear < otherYear) {
-            return -1;
-        } else if (myMonth > otherMonth) {
-            return 1;
-        } else if (myMonth < otherMonth) {
-            return -1;
-        } else if (myDay > otherDay) {
-            return 1;
-        } else if (myDay < otherDay) {
-            return -1;
-        } else {
-            return 0;
-        }
-
+    public int compareTo(Object other) {
+        YearMonthDayComparator comparator = new YearMonthDayComparator();
+        return comparator.compare(this, other);
     }
-
+    
     public String getRawText() {
         return rawText;
     }
@@ -310,6 +276,4 @@ public class Corpus implements Comparable {
     }
 
     //
-    
-
 }

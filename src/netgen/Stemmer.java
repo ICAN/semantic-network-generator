@@ -7,7 +7,7 @@ package netgen;
  */
 public interface Stemmer {
     
-    //Stemmers gotta stem()
+    //Stemmers gotta stem(word)
     public abstract String stem(String word);
     
 }

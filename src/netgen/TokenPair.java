@@ -2,7 +2,7 @@
 package netgen;
 
 //Composed of two tokens; used to form edges in a semantic network
-public class Pair {
+public class TokenPair {
     private Token a;
     private Token b;
 
@@ -34,7 +34,7 @@ public class Pair {
         this.b = b;
     }
     
-    public Pair(Token a, Token b) {
+    public TokenPair(Token a, Token b) {
         if(a.getSignature().compareTo(b.getSignature()) > 0) {
             this.a = new Token(a.getSignature());
             this.b = new Token(b.getSignature());
@@ -44,7 +44,7 @@ public class Pair {
         }
     }
     
-    public Pair(String a, String b) {
+    public TokenPair(String a, String b) {
         if(a.compareTo(b) > 0) {
             this.a = new Token(a);
             this.b = new Token(b);
@@ -55,21 +55,6 @@ public class Pair {
     }
     
     
-    @Override
-    public boolean equals(Object other) {
-        if(other.getClass() != this.getClass()) {
-            return false;
-        } else if (a.getSignature().equalsIgnoreCase(((Pair)other).getA().getSignature())
-                && b.getSignature().equalsIgnoreCase(((Pair)other).getB().getSignature())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    @Override
-    public int hashCode() {
-        return (a.hashCode()/2 + a.hashCode()%2 - b.hashCode()%2 + b.hashCode()/2);
-    }
+
     
 }
