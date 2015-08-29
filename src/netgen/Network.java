@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+
+import netgen.Preprocessing.Token;
+import netgen.Preprocessing.TokenPair;
+
 import java.util.Random;
 
 public class Network {

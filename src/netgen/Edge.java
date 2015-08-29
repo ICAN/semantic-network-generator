@@ -1,5 +1,7 @@
 package netgen;
 
+import netgen.Preprocessing.TokenPair;
+
 public class Edge implements Comparable {
     
     private TokenPair pair;

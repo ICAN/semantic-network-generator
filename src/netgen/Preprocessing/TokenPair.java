@@ -1,5 +1,5 @@
 
-package netgen;
+package netgen.Preprocessing;
 
 //Composed of two tokens; used to form edges in a semantic network
 public class TokenPair {

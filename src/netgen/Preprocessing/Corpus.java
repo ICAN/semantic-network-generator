@@ -1,4 +1,4 @@
-package netgen;
+package netgen.Preprocessing;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,6 +6,11 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import netgen.ChronologicallyComparable;
+import netgen.YearMonthDayComparator;
+import netgen.Preprocessing.Token.Tag;
+
 import java.util.HashMap;
 
 public class Corpus implements ChronologicallyComparable {

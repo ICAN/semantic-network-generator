@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package netgen;
+package netgen.DataSources;
 
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import netgen.Preprocessing.Corpus;
 
 /**
  *
