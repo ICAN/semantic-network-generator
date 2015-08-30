@@ -6,12 +6,6 @@ import java.util.HashSet;
 import netgen.Preprocessing.PreprocessingComponent;
 import netgen.Preprocessing.Token;
 
-/*
- * I'd like to implement the concept of an expectation of what state the 
- * incoming text is in but that might be something better handled by a manager 
- * class.
- */
-
 
 public class StopwordRemoval implements PreprocessingComponent<ArrayList<ArrayList<Token>>>
 {

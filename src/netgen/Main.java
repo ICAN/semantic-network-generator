@@ -5,11 +5,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import netgen.Preprocessing.PreprocessingManager;
+import netgen.Preprocessing.Token;
+
 
 
 public class Main {
     
-    //TODO: Fix
+	public static void main(String[] args) 
+	{
+		PreprocessingManager manager = new PreprocessingManager();
+		
+		ArrayList<ArrayList<Token>> tokenCorpus = manager.createTokenizedCorpus();
+		
+		
+		
+	}
+
+	
+	
+	//TODO: Fix
 //    public static void makeIndividualNetworksForEachArticle(String name) {
 //
 //        //Initialize Stemmer
@@ -101,8 +116,5 @@ public class Main {
     
     
     
-    public static void main(String[] args) {
-
-    }
     
 }

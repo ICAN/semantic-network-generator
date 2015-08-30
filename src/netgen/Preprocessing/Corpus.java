@@ -47,17 +47,10 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
     }
 
     //////////TEXT PROCESSING METHODS///////////
-
-    //Eliminates duplicates from a list of tokens
-    //NOTE: The returned list may no longer be in the same order
-
-
-
-
     public void generateFrequencyMap() {
         HashMap<Token, Integer> map = new HashMap<>();
 
-        for (ArrayList<Token> tokens : this.processedText) {
+        for (ArrayList<Token> tokens : processedText) {
             for (int i = 0; i < tokens.size(); i++) {
                 if (map.containsKey(tokens.get(i))) {
                     int value = map.get(tokens.get(i)) + 1;
@@ -67,37 +60,11 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
                 }
             }
         }
-        this.tokenFrequency = map;
+        tokenFrequency = map;
     }
 
     
-    // This method is what I envision the manager class doing  
-    //Conducts all processing activities on the corpus
 
-    /*
-    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
-        //Set stemmer and stopwords
-        this.stemmer = stemmer;
-        this.stopwords = stopwords;
-
-        //Split on sentences, filter characters, and tokenize
-        ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
-
-        for (ArrayList<Token> line : processed) {
-            for (Token token : line) {
-                token.setSignature(stemmer.stem(token.getSignature()));
-            }
-        }
-
-        this.processedText = processed;
-
-        //Filter stopwords, generate metadata
-        //TODO: switch to tagging stopwords?
-        this.removeStopwords();
-        this.generateFrequencyMap();
-
-    }
-*/
 
     //ACCESSORS AND MUTATORS
     //Returns a set of all unique tokens in the corpus
@@ -180,7 +147,9 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         return processedText;
     }
 
-    /*
+    /*  This is a dangerous method, I want to get away from directly mutating 
+     *  	the corpus without calling a component in a standard and 
+     *  	predicatable way.
     public void setProcessedText(ArrayList<ArrayList<Token>> processedText) {
         this.processedText = processedText;
     }

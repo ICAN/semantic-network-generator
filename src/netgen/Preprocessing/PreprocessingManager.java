@@ -1,7 +1,70 @@
 package netgen.Preprocessing;
 
+import java.util.ArrayList;
+
+import netgen.DataSources.IO;
+
 public class PreprocessingManager
 {
+
+	public ArrayList<ArrayList<Token>> createTokenizedCorpus() throws Exception
+	{
+		ArrayList<Corpus> allCorpii = IO.importEntireSourcesFolder();
+		
+		for( Corpus corpus : allCorpii)
+		{
+	//		corpus = new 
+		}
+		
+	}
+	
+	
+	public ArrayList<ArrayList<Token>> createTokenizedCorpus() 
+	{
+		ArrayList<ArrayList<Token>> tokenizedCorpus;
+		
+		
+		
+		return tokenizedCorpus;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/* Will contain logic for running preprocessing components on the Corpus
 	* object. Will provide an entry point to the network generator level.
 	* 
@@ -18,6 +81,36 @@ public class PreprocessingManager
 	* input corpus has been processed already and throw an exception if you 
 	* are trying to perform actions in a wrong order.
 	*/
+	
+
+    // This method is what I envision the manager class handling  
+    // Conducts some processing activities on the corpus
+    /*
+    public void process(Stemmer stemmer, HashSet<Token> stopwords) {
+        //Set stemmer and stopwords
+        this.stemmer = stemmer;
+        this.stopwords = stopwords;
+
+        //Split on sentences, filter characters, and tokenize
+        ArrayList<ArrayList<Token>> processed = Corpus.tokenize(makeFilteredStrings(Corpus.splitSentences(rawText)));
+
+        for (ArrayList<Token> line : processed) {
+            for (Token token : line) {
+                token.setSignature(stemmer.stem(token.getSignature()));
+            }
+        }
+
+        this.processedText = processed;
+
+        //Filter stopwords, generate metadata
+        //TODO: switch to tagging stopwords?
+        this.removeStopwords();
+        this.generateFrequencyMap();
+
+    }
+*/
+	
+	
 	
 	
 }
