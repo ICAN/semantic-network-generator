@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import netgen.Preprocessing.Corpus;
+import netgen.Preprocessing.RawCorpus;
 
 /**
  *
@@ -21,9 +22,9 @@ import netgen.Preprocessing.Corpus;
  */
 public class IO {
 
-	public static ArrayList<Corpus> importEntireSourcesFolder() throws Exception
+	public static ArrayList<RawCorpus> importEntireSourcesFolder() throws Exception
 	{
-		ArrayList<Corpus> fullSourceFolderCorpii = new ArrayList<Corpus>();
+		ArrayList<RawCorpus> fullSourceFolderCorpii = new ArrayList<RawCorpus>();
 
 		String filepath = new File("").getAbsolutePath();
 		filepath.concat("./src/netgen/DataSources/Sources");
@@ -33,7 +34,7 @@ public class IO {
 		if (directoryListing != null) {
 			for (File child : directoryListing) 
 			{
-				String mode = child.getName().split(".")[0];
+				String mode = child.getName().split("\\.")[0];
 				fullSourceFolderCorpii.addAll(importCorpora(readFileAsLines(child.getName()), mode));
 			}
 		} 
@@ -52,6 +53,7 @@ public class IO {
 		try {
 			inFile = new Scanner(new FileReader(fileName));
 		} catch (Exception e) {
+			System.out.println(fileName);
 			System.out.println("Failed to open input file. Exiting.");
 			System.exit(-1);
 		}
@@ -80,9 +82,9 @@ public class IO {
 
 	//Produces an arraylist of KTUU, ADN or Homer Tribune corpora 
 	//from unprocessed lines of text
-	public static ArrayList<Corpus> importCorpora(ArrayList<String> lines, String mode) {
+	public static ArrayList<RawCorpus> importCorpora(ArrayList<String> lines, String mode) {
 
-		ArrayList<Corpus> corpora = new ArrayList<>();
+		ArrayList<RawCorpus> corpora = new ArrayList<>();
 		ArrayList<String> rows = new ArrayList<>();
 		ArrayList<String> fields = new ArrayList<>();
 
@@ -103,37 +105,47 @@ public class IO {
 		//            count++;
 		//        }
 		if (mode.equalsIgnoreCase("adn")) {
-
 			//in DB dump: Article, Link, Title, Date
 			for (int i = 3; i < fields.size(); i += 4) {
-				Corpus corpus = new Corpus(fields.get(i - 3), "adn", fields.get(i));
-				corpus.setLink(fields.get(i - 2));
-				corpus.setTitle(fields.get(i - 1));
-				corpus.setDate(fields.get(i));
-				corpora.add(corpus);
+				String inRaw = fields.get(i -3);
+				String inSource = "adn";
+				String inDate = fields.get(i);
+				String inTitle = fields.get(i - 1);
+				String inSummary = "";
+				String inLink = fields.get(i - 2);
+				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+						inDate, inTitle, inSummary, inLink);
+				corpora.add(rawCorpus);
 			}
 
 		} else if (mode.equalsIgnoreCase("ktuu")) {
 
 			//in DB dump: Link, Summary, Article, Title, Date
 			for (int i = 4; i < fields.size(); i += 5) {
-				Corpus corpus = new Corpus(fields.get(i - 2), "ktuu", fields.get(i));
-				corpus.setDate(fields.get(i));
-				corpus.setLink(fields.get(i - 4));
-				corpus.setSummary(fields.get(i - 3));
-				corpus.setTitle(fields.get(i - 1));
-				corpora.add(corpus);
+				String inRaw = fields.get(i -2);
+				String inSource = "ktuu";
+				String inDate = fields.get(i);
+				String inTitle = fields.get(i - 1);
+				String inSummary = fields.get(i - 3);
+				String inLink = fields.get(i - 4);
+				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+						inDate, inTitle, inSummary, inLink);
+				corpora.add(rawCorpus);
 			}
 
 		} else if (mode.equalsIgnoreCase("tribune")) {
 
 			//in DB dump: Link, Article, Title, Date
 			for (int i = 3; i < fields.size(); i += 4) {
-				Corpus corpus = new Corpus(fields.get(i - 2), "tribune", fields.get(i));
-				corpus.setLink(fields.get(i - 3));
-				corpus.setTitle(fields.get(i - 1));
-				corpus.setDate(fields.get(i));
-				corpora.add(corpus);
+				String inRaw = fields.get(i -2);
+				String inSource = "tribune";
+				String inDate = fields.get(i);
+				String inTitle = fields.get(i - 1);
+				String inSummary = "";
+				String inLink = fields.get(i - 3);
+				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+						inDate, inTitle, inSummary, inLink);
+				corpora.add(rawCorpus);
 			}
 
 		} else {

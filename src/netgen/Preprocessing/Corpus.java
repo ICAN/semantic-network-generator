@@ -1,16 +1,10 @@
 package netgen.Preprocessing;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import netgen.ChronologicallyComparable;
 import netgen.YearMonthDayComparator;
-import netgen.Preprocessing.Token.Tag;
-
 import java.util.HashMap;
 
 /* This class should make available text for processing.
@@ -26,26 +20,53 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
 
     //CLASS MEMBERS
 	private ArrayList<ArrayList<Token>> processedText;
-    private String summary;
-    private String title;
-    private String link;
     private HashMap<Token, Integer> tokenFrequency;
     private Calendar calendar;
 
-    //private String rawText;
-    //private RawCorpus rawCorpus;
-    //private HashSet<Token> stopwords;
-    //private HashSet<Token> namedEntities;
-    //private Stemmer stemmer;
 
     //CONSTRUCTORS & ASSOCIATED METHODS
-    public Corpus(String inRaw, String inSource, String inDate) {
-        super(inRaw,inSource,inDate);
-        title = "";
-        link = "";
-        summary = "";
+    public Corpus(String inRaw, String inSource, String inDate, String inTitle, 
+    		String inSummary, String inLink) 
+    {
+    	super(inRaw,inSource,inDate, inTitle, inSummary.trim(), inLink);       
+    }
+    
+    public Corpus(RawCorpus inCorpus)
+    {
+    	super(inCorpus.getRawText(), inCorpus.getSource(), inCorpus.getDate(), 
+    			inCorpus.getTitle(), inCorpus.getSummary(), inCorpus.getLink());
     }
 
+//Accepts only YYYY-MM-DD format
+//Warns & sets to "UNKOWN DATE" if provided nonmatching string
+    public void setDate(String date) {
+    	if (date.trim().matches("[0-9]{4}(-[0-9]{2}){2}")) {
+    		this.calendar.set(Integer.parseInt(date.substring(0, 3)),
+    				Integer.parseInt(date.substring(5, 6)),
+    				Integer.parseInt(date.substring(8, 9)));
+    	} else {
+    		this.calendar.set(0, 0, 0);
+    		System.out.println("Date? " + date);
+    	}
+    }
+    
+    /*
+//Accepts only alphanumeric characters and spaces
+//Filters out all other characters
+    public void setTitle(String title) {
+    	this.title = title.replaceAll("[^A-Za-z0-9 ]", "").trim();
+    }
+    
+    
+    public void setLink(String link) {
+    	this.link = link.trim();
+    	if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+    		System.out.println("Link? " + this.link);
+    	}
+    }
+    */
+    
+    
     //////////TEXT PROCESSING METHODS///////////
     public void generateFrequencyMap() {
         HashMap<Token, Integer> map = new HashMap<>();
@@ -95,47 +116,6 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         return calendar.get(Calendar.YEAR);
     }
     
-    //Accepts only YYYY-MM-DD format
-    //Warns & sets to "UNKOWN DATE" if provided nonmatching string
-    public void setDate(String date) {
-        if (date.trim().matches("[0-9]{4}(-[0-9]{2}){2}")) {
-            this.calendar.set(Integer.parseInt(date.substring(0, 3)),
-                    Integer.parseInt(date.substring(5, 6)),
-                    Integer.parseInt(date.substring(8, 9)));
-        } else {
-            this.calendar.set(0, 0, 0);
-            System.out.println("Date? " + date);
-        }
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary.trim();
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    //Accepts only alphanumeric characters and spaces
-    //Filters out all other characters
-    public void setTitle(String title) {
-        this.title = title.replaceAll("[^A-Za-z0-9 ]", "").trim();
-    }
-
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link.trim();
-        if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
-            System.out.println("Link? " + this.link);
-        }
-    }
 
     @Override
     public int compareTo(Object other) {
@@ -147,12 +127,9 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         return processedText;
     }
 
-    /*  This is a dangerous method, I want to get away from directly mutating 
-     *  	the corpus without calling a component in a standard and 
-     *  	predicatable way.
-    public void setProcessedText(ArrayList<ArrayList<Token>> processedText) {
-        this.processedText = processedText;
+    public void setProcessedText(ArrayList<ArrayList<Token>> inText)
+    {
+    	processedText = inText;
     }
-     */
 
 }

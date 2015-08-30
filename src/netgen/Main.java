@@ -12,12 +12,13 @@ import netgen.Preprocessing.Token;
 
 public class Main {
     
-	public static void main(String[] args) 
+	public static void main(String[] args) throws Exception 
 	{
 		PreprocessingManager manager = new PreprocessingManager();
 		
-		ArrayList<ArrayList<Token>> tokenCorpus = manager.createTokenizedCorpus();
+		ArrayList<ArrayList<Token>> tokenCorpus = manager.createTokenizedCorpii();
 		
+		System.out.println(tokenCorpus);
 		
 		
 	}

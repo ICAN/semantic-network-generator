@@ -713,4 +713,16 @@ public class LancasterStemmer implements PreprocessingComponent, Stemmer {
 
         return result;
     }
+
+	@Override
+	public Object getProcessedCorpus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String showRequiredTypes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

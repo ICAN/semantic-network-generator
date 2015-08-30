@@ -13,6 +13,7 @@ public class Tokenizer implements PreprocessingComponent<ArrayList<Token>>
 	{
 		tokenizedCorpus = tokenize(inCorpus);		
 	}
+
 	
     //Takes a filtered sentence and returns its contents as a list of tokens
     //Possible alternative: return a token set rather than a token list?

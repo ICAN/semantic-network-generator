@@ -3,49 +3,37 @@ package netgen.Preprocessing;
 import java.util.ArrayList;
 
 import netgen.DataSources.IO;
+import netgen.Preprocessing.Components.SentenceSplitter;
+import netgen.Preprocessing.Components.StopwordRemoval;
+import netgen.Preprocessing.Components.Tokenizer;
 
 public class PreprocessingManager
 {
 
-	public ArrayList<ArrayList<Token>> createTokenizedCorpus() throws Exception
+	public ArrayList<ArrayList<Token>> createTokenizedCorpii() throws Exception
 	{
-		ArrayList<Corpus> allCorpii = IO.importEntireSourcesFolder();
+		ArrayList<RawCorpus> allCorpii = IO.importEntireSourcesFolder();
 		
-		for( Corpus corpus : allCorpii)
+		ArrayList<ArrayList<Token>> tokenizedSentences = new ArrayList<ArrayList<Token>>();
+		ArrayList<ArrayList<Token>> stoppedSentences = new ArrayList<ArrayList<Token>>();
+		
+		
+		for( RawCorpus corpus : allCorpii)
 		{
-	//		corpus = new 
+			SentenceSplitter sentences = new SentenceSplitter(corpus.getRawText());
+			for(String sentence : sentences.getProcessedCorpus())
+			{
+				Tokenizer tokens = new Tokenizer(sentence);
+				tokenizedSentences.add(tokens.getProcessedCorpus());
+				StopwordRemoval stopword = new StopwordRemoval(tokenizedSentences);
+				stoppedSentences.addAll(stopword.getProcessedCorpus());
+			}
+			
+			// Then Stemmer
+			
 		}
-		
+		return stoppedSentences;
 	}
-	
-	
-	public ArrayList<ArrayList<Token>> createTokenizedCorpus() 
-	{
-		ArrayList<ArrayList<Token>> tokenizedCorpus;
-		
-		
-		
-		return tokenizedCorpus;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
