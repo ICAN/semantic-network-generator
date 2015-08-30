@@ -1,9 +1,9 @@
 package netgen.Preprocessing;
 
-public interface PreprocessingComponent
+public interface PreprocessingComponent <CorpusType>
 {
-	public String getProcessedCorpus();
-	
+	public CorpusType getProcessedCorpus();
+	public String showRequiredTypes(); 
 	
 	
 	

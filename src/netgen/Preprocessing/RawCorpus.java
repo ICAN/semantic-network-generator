@@ -1,13 +1,12 @@
 package netgen.Preprocessing;
 
-// This class needs to provide the raw article text to a preprocessing 
-// component that requests it
+//Base class extended by the more commonly used Corpus class 
 public class RawCorpus
 {
 	
-	private String rawText;
-	private String source;
-	private String date;
+	private final String rawText;
+	private final String source;
+	private final String date;
 	
 	
 	public RawCorpus(String inRaw, String inSource, String inDate)

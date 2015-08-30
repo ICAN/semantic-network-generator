@@ -1,4 +1,4 @@
-package netgen.Preprocessing;
+package netgen.Preprocessing.Components;
 /*
 
  Porter stemmer in Java. The original paper is in
@@ -34,6 +34,9 @@ package netgen.Preprocessing;
  */
 import java.io.*;
 
+import netgen.Preprocessing.PreprocessingComponent;
+import netgen.Preprocessing.Stemmer;
+
 /**
  * Stemmer, implementing the Porter Stemming Algorithm
  *
@@ -41,7 +44,7 @@ import java.io.*;
  * provided a character at time (by calling add()), or at once by calling one of
  * the various stem(something) methods.
  */
-public class PorterStemmer implements Stemmer {
+public class PorterStemmer implements PreprocessingComponent, Stemmer {
 
     private char[] b;
     private int i, /* offset into b */
@@ -104,7 +107,6 @@ public class PorterStemmer implements Stemmer {
         this.reset();
         return stemmed;
     }
-    
     
 
     /**

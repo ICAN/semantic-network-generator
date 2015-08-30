@@ -1,9 +1,12 @@
-package netgen.Preprocessing;
+package netgen.Preprocessing.Components;
 
 /*	Please see the license information in the header below. */
 import java.io.*;
 import java.lang.*;
 import java.util.*;
+
+import netgen.Preprocessing.PreprocessingComponent;
+import netgen.Preprocessing.Stemmer;
 
 /**
  * LancasterStemmer: Implements the Lancaster (Paice/Husk) word stemmer.

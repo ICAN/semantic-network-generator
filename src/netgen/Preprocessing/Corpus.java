@@ -30,10 +30,10 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
     private String title;
     private String link;
     private HashMap<Token, Integer> tokenFrequency;
+    private Calendar calendar;
 
     //private String rawText;
     //private RawCorpus rawCorpus;
-    //private Calendar calendar;
     //private HashSet<Token> stopwords;
     //private HashSet<Token> namedEntities;
     //private Stemmer stemmer;
@@ -41,106 +41,19 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
     //CONSTRUCTORS & ASSOCIATED METHODS
     public Corpus(String inRaw, String inSource, String inDate) {
         super(inRaw,inSource,inDate);
-    	//rawText = text.trim();
-        //calendar = Calendar.getInstance();
         title = "";
         link = "";
         summary = "";
     }
 
     //////////TEXT PROCESSING METHODS///////////
-    //Splits corpus into strings consisting of complete sentences
-    //Splits on both periods and semicolons
-    public static ArrayList<String> splitSentences(ArrayList<String> corpus) {
-        ArrayList<String> sentences = new ArrayList<>();
-
-        String preCompletion = "( ([A-Za-z0-9,]|\\#|-|'){2,}?)";
-        String completion = "(\\.|;|\\?|!)+"; //Valid completion characters for a sentence; 1 or more required, any composition permitted
-        String postCompletion = "((\\\"|\\\'|[0-9]| |\\z|$|\\n){0,3})"; //Post-sentence characters permitted; extremely tolerant
-
-        for (String line : corpus) {
-            Pattern pattern = Pattern.compile(preCompletion + completion + postCompletion);
-            Matcher m = pattern.matcher(line);
-            int index = 0;
-            while (m.find()) {
-                String s = line.substring(index, m.end());
-                if (!s.matches(".* (Mr|Mrs|Ms|Dr|Rev|Esq|Mass|Conn).( |,)") //Avoid matching on abbreviated titles 
-                        //TODO: Make this list of titles more comprehensive
-                        //TODO: 
-                        && !s.matches(".*[0-9]+(\\.|,)[0-9]+")) //Avoid matching decimal numbers
-                {
-                    if (s.length() > 1) { //avoid adding empty sentences
-                        sentences.add(s.trim());
-                        index = m.end();
-                    }
-                }
-            }
-        }
-
-        return sentences;
-    }
-
-    //Single string version of sentence splitter
-    public static ArrayList<String> splitSentences(String line) {
-        ArrayList<String> list = new ArrayList<String>(1);
-        list.add(line);
-        return Corpus.splitSentences(list);
-    }
-
-    //Modified version which takes an ArrayList of strings
-    public static ArrayList<ArrayList<Token>> tokenize(ArrayList<String> input) {
-        ArrayList<ArrayList<Token>> output = new ArrayList<>();
-
-        for (String line : input) {
-            output.add(Corpus.tokenize(line));
-        }
-        return output;
-    }
-
-    //Takes a filtered sentence and returns its contents as a list of tokens
-    //Possible alternative: return a token set rather than a token list?
-    public static ArrayList<Token> tokenize(String input) {
-        ArrayList<Token> sentence = new ArrayList<>();
-        String[] split = input.split("\\s+");
-        for (String word : split) {
-            word = word.trim();
-            if (word.length() > 0) {
-                sentence.add(new Token(word));
-            }
-        }
-        return sentence;
-    }
 
     //Eliminates duplicates from a list of tokens
     //NOTE: The returned list may no longer be in the same order
-    public static void removeDuplicates(ArrayList<Token> tokenlist) {
-        HashSet<Token> tokenset = new HashSet<>();
-        tokenset.addAll(tokenlist);
-        tokenlist = new ArrayList<>();
-        tokenlist.addAll(tokenset);
-    }
-
-    //Filters out everything but spaces, letters
-    //Trims and converts letters to lower-case
-    public static String filterNonAlpha(String input) {
-        return input.replaceAll("[^a-zA-Z ]", " ").toLowerCase().trim();
-    }
-
-    //Filters out everything but spaces, letters
-    //Trims and converts to lower-case
-    public static ArrayList<String> makeFilteredStrings(ArrayList<String> input) {
-        ArrayList<String> output = new ArrayList<>();
-        for (String line : input) {
-            output.add(Corpus.filterNonAlpha(line));
-        }
-        return output;
-    }
 
 
 
 
-
-    
     public void generateFrequencyMap() {
         HashMap<Token, Integer> map = new HashMap<>();
 
@@ -157,7 +70,11 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         this.tokenFrequency = map;
     }
 
+    
+    // This method is what I envision the manager class doing  
     //Conducts all processing activities on the corpus
+
+    /*
     public void process(Stemmer stemmer, HashSet<Token> stopwords) {
         //Set stemmer and stopwords
         this.stemmer = stemmer;
@@ -180,6 +97,7 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         this.generateFrequencyMap();
 
     }
+*/
 
     //ACCESSORS AND MUTATORS
     //Returns a set of all unique tokens in the corpus
@@ -262,11 +180,10 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
         return processedText;
     }
 
+    /*
     public void setProcessedText(ArrayList<ArrayList<Token>> processedText) {
         this.processedText = processedText;
     }
+     */
 
-
-
-    //
 }
