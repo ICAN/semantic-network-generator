@@ -13,24 +13,36 @@ import netgen.Preprocessing.Token.Tag;
 
 import java.util.HashMap;
 
-public class Corpus implements ChronologicallyComparable {
+/* This class should make available text for processing.
+ *A distinction should be made between raw text and text in the middle of 
+ *		a processing pipeline.
+ * The class extends RawCorpus, it should always remember where it started
+ * 		through the rawText field inherited by RawCorpus superclass.
+ * Honestly, this class could be renamed to Article since it assumes every 
+ * 		incoming instance has a summary, title, link etc.
+ */
+
+public class Corpus extends RawCorpus implements ChronologicallyComparable {
 
     //CLASS MEMBERS
-    private String rawText;
-    private ArrayList<ArrayList<Token>> processedText;
-    private Calendar calendar;
+	private ArrayList<ArrayList<Token>> processedText;
     private String summary;
     private String title;
     private String link;
     private HashMap<Token, Integer> tokenFrequency;
-    private HashSet<Token> stopwords;
-    private HashSet<Token> namedEntities;
-    private Stemmer stemmer;
+
+    //private String rawText;
+    //private RawCorpus rawCorpus;
+    //private Calendar calendar;
+    //private HashSet<Token> stopwords;
+    //private HashSet<Token> namedEntities;
+    //private Stemmer stemmer;
 
     //CONSTRUCTORS & ASSOCIATED METHODS
-    public Corpus(String text) {
-        rawText = text.trim();
-        calendar = Calendar.getInstance();
+    public Corpus(String inRaw, String inSource, String inDate) {
+        super(inRaw,inSource,inDate);
+    	//rawText = text.trim();
+        //calendar = Calendar.getInstance();
         title = "";
         link = "";
         summary = "";
@@ -124,23 +136,9 @@ public class Corpus implements ChronologicallyComparable {
         return output;
     }
 
-    //Removes stopwords from this processed text
-    public void removeStopwords() {
-        for (ArrayList<Token> sentence : this.processedText) {
-            sentence.removeAll(this.stopwords);
-        }
-    }
 
-    //Tags stopwords as such
-    public void tagStopwords() {
-        for (ArrayList<Token> sentence : this.processedText) {
-            for (Token token : sentence) {
-                if (stopwords.contains(token)) {
-                    token.tag(Token.Tag.STOPWORD);
-                }
-            }
-        }
-    }
+
+
 
     
     public void generateFrequencyMap() {
@@ -260,14 +258,6 @@ public class Corpus implements ChronologicallyComparable {
         return comparator.compare(this, other);
     }
     
-    public String getRawText() {
-        return rawText;
-    }
-
-    public void setRawText(String rawText) {
-        this.rawText = rawText;
-    }
-
     public ArrayList<ArrayList<Token>> getProcessedText() {
         return processedText;
     }
@@ -276,9 +266,7 @@ public class Corpus implements ChronologicallyComparable {
         this.processedText = processedText;
     }
 
-    public void setStopwords(HashSet<Token> stopwords) {
-        this.stopwords = stopwords;
-    }
+
 
     //
 }

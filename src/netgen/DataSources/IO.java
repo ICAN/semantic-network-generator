@@ -17,7 +17,15 @@ import netgen.Preprocessing.Corpus;
  * @author Neal
  */
 public class IO {
-
+	
+	public static ArrayList<String> readAllFilesAsLines()
+	{
+		//for file in data dir 
+		// 		readFileAsLines()
+		//		
+		
+	}
+	
     //Reads a file & returns each line in the file as a string in an arraylist
     public static ArrayList<String> readFileAsLines(String fileName) {
         ArrayList<String> lines = new ArrayList<>();

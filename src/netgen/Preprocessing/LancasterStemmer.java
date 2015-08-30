@@ -38,7 +38,7 @@ import java.util.*;
  *
  *
  */
-public class LancasterStemmer implements Stemmer {
+public class LancasterStemmer implements PreprocessingComponent, Stemmer {
 
     /**
      * Prefixes to remove from words before stemming.
