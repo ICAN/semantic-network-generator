@@ -17,13 +17,18 @@ public class PreprocessingManager
 		ArrayList<Corpus> finalCorpii = new ArrayList<Corpus>();
 		
 		ArrayList<ArrayList<Token>> tokenizedSentences = new ArrayList<ArrayList<Token>>();
-
+		System.out.println(allRawCorpii.size() + " is the number of articles in the full corpus");
+		SentenceSplitter sentences;
 		for( RawCorpus rawCorpus : allRawCorpii) // Iterate over all the raw articles from the three imported DB files
-		{
+		{											// Is this really happening? Yes
 			
 			//System.out.println(rawCorpus.getTitle() + " is the title of this article");
 			//System.out.println(rawCorpus.getRawText().length() + " is the length of this article string");
-			SentenceSplitter sentences = new SentenceSplitter(rawCorpus.getRawText());
+			sentences = new SentenceSplitter(rawCorpus.getRawText());
+			System.out.println(sentences.getProcessedCorpus().size() + " is the number of sentences in the article");
+			System.out.println(sentences.getProcessedCorpus().get(0) + " is the first sentence in the article");
+			System.out.println(sentences.getProcessedCorpus().get(1) + " is the second sentence in the article");
+				
 			for(String sentence : sentences.getProcessedCorpus())
 			{
 				

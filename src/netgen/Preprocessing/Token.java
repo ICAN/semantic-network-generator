@@ -2,7 +2,8 @@ package netgen.Preprocessing;
 
 import java.util.HashSet;
 
-public class Token {
+public class Token
+{
 
     private String signature;
 //    private HashSet<Tag> tags;

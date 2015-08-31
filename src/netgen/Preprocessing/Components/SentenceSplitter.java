@@ -54,9 +54,10 @@ public class SentenceSplitter implements PreprocessingComponent<ArrayList<String
 	
     //Single string version of sentence splitter
     public ArrayList<String> splitSentences(String line) {
-        ArrayList<String> list = new ArrayList<String>(1);
+    	
+        ArrayList<String> list = new ArrayList<String>();
         list.add(line);
-        splitSentences(list);
+        list = splitSentences(list);
         return list;
     }
 
