@@ -9,11 +9,20 @@ import netgen.Preprocessing.Token;
 
 public class TokenwiseNetwork extends Network
 {
-	public TokenwiseNetwork(Corpus inCorpus, int windowSize)
+	
+	private int windowSize;
+	
+	public TokenwiseNetwork(Corpus inCorpus, int inWindowSize)
 	{
 		super(inCorpus);
+		windowSize = inWindowSize;
 		generateByTokenwiseSlidingWindow(inCorpus.getProcessedText(), windowSize);
 		
+	}
+	
+	public int getWindowSize()
+	{
+		return windowSize;
 	}
 	
 	/*
@@ -22,33 +31,24 @@ public class TokenwiseNetwork extends Network
     Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
     */
    //TODO: Fix
-   private static Network generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
-
-       //Network network = new Network();
-
-       //HashMap<TokenPair, Double> edgeset = new HashMap<>();
-   	
+   private void generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
    	
        for (ArrayList<Token> line : lines) {
-           for (int i = 0; i < line.size() - windowSize; i++) {
-               for (int j = i + 1; j < i + windowSize; j++) {
-                   if (!line.get(i).equals(line.get(j))) {
+           for (int i = 0; i < line.size() - windowSize; i++) { //For Token in Sentences(Line)
+               for (int j = i + 1; j < i + windowSize; j++) {	// Look forward comparing current token to all within the windowsize
+                   if (!line.get(i).equals(line.get(j))) {		// Only record a Pair if they are different words. Does equals() actually compare string text here?
 
                        TokenPair pair = new TokenPair(line.get(i).getSignature(), line.get(j).getSignature());
 
-                       if (edgeset.containsKey(pair)) {
-                           edgeset.put(pair, edgeset.get(pair) + 1);
+                       if (edgeSet.containsKey(pair)) {
+                           edgeSet.put(pair, edgeSet.get(pair) + 1);    // Increment edge weight by one
                        } else {
-                           edgeset.put(pair, 1.0);
+                           edgeSet.put(pair, 1.0);						// Or create a new entry if first occurrence
                        }
                    }
                }
            }
        }
-
-       network.setEdgeset(edgeset);
-
-       return network;
    }
 	
 	

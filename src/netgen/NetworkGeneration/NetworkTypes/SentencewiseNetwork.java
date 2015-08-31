@@ -11,47 +11,57 @@ import netgen.Preprocessing.Token;
 
 public class SentencewiseNetwork extends Network
 {
+	public SentencewiseNetwork(Corpus inCorpus, int inMaxWindowSentences, int inMaxWindowTokens)
+	{
+		super(inCorpus);
+		if(inMaxWindowSentences == 0 && inMaxWindowTokens == 0)
+		{
+			generateBySingleSentenceWindow(corpus.getProcessedText());
+		}
+		else
+		{
+			generateByMultiSentenceSlidingWindow(corpus.getProcessedText(), inMaxWindowSentences, inMaxWindowTokens);
+		}
+	}
 	public SentencewiseNetwork(Corpus inCorpus)
 	{
 		super(inCorpus);
+		generateBySingleSentenceWindow(corpus.getProcessedText());
 	}
 	
 	
 	//Combine these two network generation methods. Single sentence edge window is 
-    //		a just a simple case of multisentence window.
+    //		a just a simple case of the multisentence window method. Or is it...
     /*
     Forms a complete graph of every line and returns the sum of all of these graphs
     Tokens will never be linked to themselves.
     Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
     */
-   private static Network generateBySingleSentenceWindow(ArrayList<ArrayList<Token>> lines) {
+   private void generateBySingleSentenceWindow(ArrayList<ArrayList<Token>> lines) {
 
-       Network network = new Network();
+//       HashMap<TokenPair, Double> edgeset = new HashMap<>();
 
-       HashMap<TokenPair, Double> edgeset = new HashMap<>();
-
-       for (ArrayList<Token> line : lines) {
-           for (int i = 0; i < line.size() - 1; i++) {
-               for (int j = i + 1; j < line.size(); j++) {
-                   if (!line.get(i).equals(line.get(j))) {
+       for (ArrayList<Token> line : lines) {									// For each line in the corpus
+           for (int i = 0; i < line.size() - 1; i++) {							// For each Token in the line
+               for (int j = i + 1; j < line.size(); j++) {						// For each Token further on in the line 
+                   if (!line.get(i).equals(line.get(j))) {						// If the Tokens aren't the same word
                        TokenPair pair = new TokenPair(line.get(i).getSignature(), line.get(j).getSignature());
-                       if (edgeset.containsKey(pair)) {
-                           edgeset.put(pair, (double)edgeset.get(pair) + 1.0);
+                       if (edgeSet.containsKey(pair)) {
+                           edgeSet.put(pair, (double)edgeSet.get(pair) + 1.0);	// Increment the edge weight if it exists in the EdgeSet
                        } else {
-                           edgeset.put(pair, 1.0);
+                           edgeSet.put(pair, 1.0);								// Or create a new entry set at weight 1.0
                        }
                    }
                }
            }
        }
-       return network;
    }
     //Multi-sentence-complete sliding window
-    public static Network generateByMultiSentenceSlidingWindow(ArrayList<ArrayList<Token>> lines, int maxWindowSentences, int maxWindowTokens) {
+    public void generateByMultiSentenceSlidingWindow(ArrayList<ArrayList<Token>> lines, 
+    		int maxWindowSentences, int maxWindowTokens) 
+    {
 
-        Network network = new Network();
-
-        HashMap<TokenPair, Double> edgeset = new HashMap<>();
+        //HashMap<TokenPair, Double> edgeset = new HashMap<>();
 
         int minWindowTokens = 1 + maxWindowTokens / 5;
 
@@ -78,18 +88,15 @@ public class SentencewiseNetwork extends Network
 
             //Add the window-level network to the main network
             for (Entry entry : windowNetwork.entrySet()) {
-                edgeset = sum(edgeset, windowNetwork);
+                edgeSet = sum(edgeSet, windowNetwork);
             }
 
         }
 
-        network.setEdgeset(edgeset);
-
-        return network;
     }
 
     //Forms a complete graph of a single sentence
-    private static HashMap<TokenPair, Double> networkSentence(ArrayList<Token> line) {
+    private HashMap<TokenPair, Double> networkSentence(ArrayList<Token> line) {
         HashMap<TokenPair, Double> edgeset = new HashMap<>();
 
         for (int i = 0; i < line.size() - 1; i++) {
