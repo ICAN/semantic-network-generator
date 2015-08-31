@@ -12,141 +12,18 @@ import netgen.Preprocessing.Token;
 
 import java.util.Random;
 
-public class Network {
+public abstract class Network {
 
-    private HashMap<TokenPair, Double> edgeset;
-    private Corpus corpus;
+    //private HashMap<TokenPair, Double> edgeset;
+    private ArrayList<Edge> edgeList;
+	private final Corpus corpus;
     
     //Simple constructor
     public Network(Corpus inCorpus) 
     {
-        edgeset = new HashMap<>();
         corpus = inCorpus;
     }
-
-    //NETWORK GENERATION METHODS
-    /*
-     Forms a complete graph of a window which slides through each line. Returns the sum of all of these graphs. 
-     Tokens will never be linked to themselves (so multiple instances of a token in a sentence will not result in reflexive edges).
-     Tokens occurring more than once in a window will be weighted proportionally to the number of times they appear
-     */
-    //TODO: Fix
-    private static Network generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
-
-        //Network network = new Network();
-
-        HashMap<TokenPair, Double> edgeset = new HashMap<>();
-
-        for (ArrayList<Token> line : lines) {
-            for (int i = 0; i < line.size() - windowSize; i++) {
-                for (int j = i + 1; j < i + windowSize; j++) {
-                    if (!line.get(i).equals(line.get(j))) {
-
-                        TokenPair pair = new TokenPair(line.get(i).getSignature(), line.get(j).getSignature());
-
-                        if (edgeset.containsKey(pair)) {
-                            edgeset.put(pair, edgeset.get(pair) + 1);
-                        } else {
-                            edgeset.put(pair, 1.0);
-                        }
-                    }
-                }
-            }
-        }
-
-        network.setEdgeset(edgeset);
-
-        return network;
-    }
-
-    //Multi-sentence-complete sliding window
-    public static Network generateByMultiSentenceSlidingWindow(ArrayList<ArrayList<Token>> lines, int maxWindowSentences, int maxWindowTokens) {
-
-        Network network = new Network();
-
-        HashMap<TokenPair, Double> edgeset = new HashMap<>();
-
-        int minWindowTokens = 1 + maxWindowTokens / 5;
-
-        //For each window...
-        //(includes smaller-size windows towards the beginning and end of the lines)
-        for (int i = 1 - maxWindowSentences; i < lines.size(); i++) {
-            ArrayList<Token> windowTokens = new ArrayList<>();
-            //Add sentences to the current window until the sentence or token maximum is met
-            for (int j = i; j < i + maxWindowSentences; j++) {
-                if (j >= 0 && j < lines.size() //Don't add out-of-bounds sentences
-                        && (windowTokens.size() + lines.get(j).size() < maxWindowTokens //Don't exceed max tokens
-                        || windowTokens.size() < minWindowTokens)) {    //Unless necessary to reach min tokens
-                    windowTokens.addAll(lines.get(j));
-                } else {
-                    break;
-                }
-            }
-
-            //Generate and attenuate the window-level network based on window size
-            HashMap<TokenPair, Double> windowNetwork = networkSentence(windowTokens);
-            for (Entry edge : windowNetwork.entrySet()) {
-                edge.setValue((double)edge.getValue() / (1 + windowNetwork.size()));
-            }
-
-            //Add the window-level network to the main network
-            for (Entry entry : windowNetwork.entrySet()) {
-                edgeset = sum(edgeset, windowNetwork);
-            }
-
-        }
-
-        network.setEdgeset(edgeset);
-
-        return network;
-    }
-
-    //Forms a complete graph of a single sentence
-    private static HashMap<TokenPair, Double> networkSentence(ArrayList<Token> line) {
-        HashMap<TokenPair, Double> edgeset = new HashMap<>();
-
-        for (int i = 0; i < line.size() - 1; i++) {
-            for (int j = i + 1; j < line.size(); j++) {
-                if (!line.get(i).equals(line.get(j))) {
-                    TokenPair pair = new TokenPair(line.get(i).getSignature(), line.get(j).getSignature());
-                    if (edgeset.containsKey(pair)) {
-                        edgeset.put(pair, (double)edgeset.get(pair) + 1.0);
-                    } else {
-                        edgeset.put(pair, 1.0);
-                    }
-                }
-            }
-        }
-        return edgeset;
-    }
-
-    /*
-     Forms a complete graph of every line and returns the sum of all of these graphs
-     Tokens will never be linked to themselves.
-     Tokens occurring more than once in a line will be weighted proportionally to the number of times they appear
-     */
-    private static Network generateBySingleSentenceWindow(ArrayList<ArrayList<Token>> lines) {
-
-        Network network = new Network();
-
-        HashMap<TokenPair, Double> edgeset = new HashMap<>();
-
-        for (ArrayList<Token> line : lines) {
-            for (int i = 0; i < line.size() - 1; i++) {
-                for (int j = i + 1; j < line.size(); j++) {
-                    if (!line.get(i).equals(line.get(j))) {
-                        TokenPair pair = new TokenPair(line.get(i).getSignature(), line.get(j).getSignature());
-                        if (edgeset.containsKey(pair)) {
-                            edgeset.put(pair, (double)edgeset.get(pair) + 1.0);
-                        } else {
-                            edgeset.put(pair, 1.0);
-                        }
-                    }
-                }
-            }
-        }
-        return network;
-    }
+    
 
     //BASIC GRAPH METHODS
     //Returns a new graph which is sum of the two argument graphs
