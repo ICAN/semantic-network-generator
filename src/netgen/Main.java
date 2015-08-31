@@ -15,10 +15,8 @@ public class Main {
 	public static void main(String[] args) throws Exception 
 	{
 		PreprocessingManager manager = new PreprocessingManager();
-		
 		ArrayList<ArrayList<Token>> tokenCorpus = manager.createTokenizedCorpii();
-		
-		System.out.println(tokenCorpus);
+		System.out.println(tokenCorpus.size() + " is the size");
 		
 		
 	}

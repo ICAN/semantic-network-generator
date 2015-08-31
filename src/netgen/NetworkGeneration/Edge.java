@@ -1,6 +1,4 @@
-package netgen;
-
-import netgen.Preprocessing.TokenPair;
+package netgen.NetworkGeneration;
 
 public class Edge implements Comparable {
     

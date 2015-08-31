@@ -1,4 +1,4 @@
-package netgen;
+package netgen.NetworkGeneration;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,18 +7,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import netgen.Preprocessing.Corpus;
 import netgen.Preprocessing.Token;
-import netgen.Preprocessing.TokenPair;
 
 import java.util.Random;
 
 public class Network {
 
     private HashMap<TokenPair, Double> edgeset;
-
+    private Corpus corpus;
+    
     //Simple constructor
-    public Network() {
+    public Network(Corpus inCorpus) 
+    {
         edgeset = new HashMap<>();
+        corpus = inCorpus;
     }
 
     //NETWORK GENERATION METHODS
@@ -30,7 +33,7 @@ public class Network {
     //TODO: Fix
     private static Network generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
 
-        Network network = new Network();
+        //Network network = new Network();
 
         HashMap<TokenPair, Double> edgeset = new HashMap<>();
 

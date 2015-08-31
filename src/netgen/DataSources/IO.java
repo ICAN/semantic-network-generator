@@ -8,6 +8,7 @@ package netgen.DataSources;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,15 +28,17 @@ public class IO {
 		ArrayList<RawCorpus> fullSourceFolderCorpii = new ArrayList<RawCorpus>();
 
 		String filepath = new File("").getAbsolutePath();
-		filepath.concat("./src/netgen/DataSources/Sources");
-
+		filepath = filepath.concat("/src/netgen/DataSources/Sources");
 		File dir = new File(filepath);
 		File[] directoryListing = dir.listFiles();
 		if (directoryListing != null) {
 			for (File child : directoryListing) 
 			{
 				String mode = child.getName().split("\\.")[0];
-				fullSourceFolderCorpii.addAll(importCorpora(readFileAsLines(child.getName()), mode));
+				System.out.println("mode = " + mode);
+				filepath = "src/netgen/DataSources/Sources/" + child.getName();
+				System.out.println("filepath = " + filepath);
+				fullSourceFolderCorpii.addAll(importCorpora(readFileAsLines(filepath), mode));
 			}
 		} 
 		else 
@@ -51,9 +54,10 @@ public class IO {
 		Scanner inFile = null;
 
 		try {
+			System.out.println(new File("").getAbsolutePath());
+			System.out.println(fileName);
 			inFile = new Scanner(new FileReader(fileName));
 		} catch (Exception e) {
-			System.out.println(fileName);
 			System.out.println("Failed to open input file. Exiting.");
 			System.exit(-1);
 		}

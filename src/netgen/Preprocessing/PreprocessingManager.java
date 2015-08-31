@@ -25,14 +25,14 @@ public class PreprocessingManager
 			{
 				Tokenizer tokens = new Tokenizer(sentence);
 				tokenizedSentences.add(tokens.getProcessedCorpus());
-				StopwordRemoval stopword = new StopwordRemoval(tokenizedSentences);
-				stoppedSentences.addAll(stopword.getProcessedCorpus());
+				//StopwordRemoval stopword = new StopwordRemoval(tokenizedSentences);
+				//stoppedSentences.addAll(stopword.getProcessedCorpus());
 			}
 			
 			// Then Stemmer
 			
 		}
-		return stoppedSentences;
+		return tokenizedSentences;
 	}
 	
 	
