@@ -18,7 +18,8 @@ public class Tokenizer implements PreprocessingComponent<ArrayList<Token>>
     //Takes a filtered sentence and returns its contents as a list of tokens
     //Possible alternative: return a token set rather than a token list?
     public ArrayList<Token> tokenize(String input) {
-        ArrayList<Token> sentence = new ArrayList<>();
+        
+    	ArrayList<Token> sentence = new ArrayList<>();
         String[] split = input.split("\\s+");
         for (String word : split) {
             word = word.trim();
@@ -26,6 +27,8 @@ public class Tokenizer implements PreprocessingComponent<ArrayList<Token>>
                 sentence.add(new Token(word));
             }
         }
+        //System.out.println("Tokenizer Input : " + input);
+        //System.out.println("Tokenizer Output Size: " + sentence.size());
         return sentence;
     }
 	

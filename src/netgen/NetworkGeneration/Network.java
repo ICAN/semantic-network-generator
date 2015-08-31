@@ -16,12 +16,13 @@ public abstract class Network {
 
     protected HashMap<TokenPair, Double> edgeSet;
     //protected ArrayList<Edge> edgeList;
-	protected final Corpus corpus;
+	protected final ArrayList<Corpus> corpii;
     
     //Simple constructor
-    public Network(Corpus inCorpus) 
+    public Network(ArrayList<Corpus> inCorpii) 
     {
-        corpus = inCorpus;
+        corpii = inCorpii;
+        edgeSet = new HashMap<TokenPair, Double>();
     }
     
 

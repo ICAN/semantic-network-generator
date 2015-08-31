@@ -10,29 +10,36 @@ import netgen.Preprocessing.Components.Tokenizer;
 public class PreprocessingManager
 {
 
-	public ArrayList<ArrayList<Token>> createTokenizedCorpii() throws Exception
+	public ArrayList<Corpus> createTokenizedCorpii() throws Exception
 	{
-		ArrayList<RawCorpus> allCorpii = IO.importEntireSourcesFolder();
+		// Reads every file in the Data Sources folder
+		ArrayList<RawCorpus> allRawCorpii = IO.importEntireSourcesFolder();
+		ArrayList<Corpus> finalCorpii = new ArrayList<Corpus>();
 		
 		ArrayList<ArrayList<Token>> tokenizedSentences = new ArrayList<ArrayList<Token>>();
-		ArrayList<ArrayList<Token>> stoppedSentences = new ArrayList<ArrayList<Token>>();
-		
-		
-		for( RawCorpus corpus : allCorpii)
+
+		for( RawCorpus rawCorpus : allRawCorpii) // Iterate over all the raw articles from the three imported DB files
 		{
-			SentenceSplitter sentences = new SentenceSplitter(corpus.getRawText());
+			
+			//System.out.println(rawCorpus.getTitle() + " is the title of this article");
+			//System.out.println(rawCorpus.getRawText().length() + " is the length of this article string");
+			SentenceSplitter sentences = new SentenceSplitter(rawCorpus.getRawText());
 			for(String sentence : sentences.getProcessedCorpus())
 			{
+				
 				Tokenizer tokens = new Tokenizer(sentence);
+				//System.out.println(tokens.getProcessedCorpus());
 				tokenizedSentences.add(tokens.getProcessedCorpus());
-				//StopwordRemoval stopword = new StopwordRemoval(tokenizedSentences);
-				//stoppedSentences.addAll(stopword.getProcessedCorpus());
+				System.out.println("Length of tokenized Sentences is " + tokenizedSentences.size());
+				System.out.println(tokenizedSentences.get(0).size());
 			}
 			
-			// Then Stemmer
-			
+			Corpus processedCorpus = new Corpus(rawCorpus);
+			processedCorpus.setProcessedText(tokenizedSentences);
+			finalCorpii.add(processedCorpus);			
+			System.out.println("finalCorpii is this big: " + finalCorpii.size());
 		}
-		return tokenizedSentences;
+		return finalCorpii;
 	}
 	
 	

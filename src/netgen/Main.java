@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import netgen.NetworkGeneration.NetworkTypes.TokenwiseNetwork;
+import netgen.Preprocessing.Corpus;
 import netgen.Preprocessing.PreprocessingManager;
 import netgen.Preprocessing.Token;
 
@@ -15,9 +17,13 @@ public class Main {
 	public static void main(String[] args) throws Exception 
 	{
 		PreprocessingManager manager = new PreprocessingManager();
-		ArrayList<ArrayList<Token>> tokenCorpus = manager.createTokenizedCorpii();
-		System.out.println(tokenCorpus.size() + " is the size");
-		
+		ArrayList<Corpus> tokenCorpii = manager.createTokenizedCorpii();
+		System.out.println(tokenCorpii.size() + " is the size of the tokenCorpii");
+		TokenwiseNetwork network = new TokenwiseNetwork(tokenCorpii, 1);
+		System.out.println("Done constructing network!");
+		System.out.println("Beginning network text dump...");
+		network.writeEdgelist("newTestOutput.txt");
+		System.out.println("Network description written to file!");
 		
 	}
 

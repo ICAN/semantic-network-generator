@@ -12,12 +12,16 @@ public class TokenwiseNetwork extends Network
 	
 	private int windowSize;
 	
-	public TokenwiseNetwork(Corpus inCorpus, int inWindowSize)
+	public TokenwiseNetwork(ArrayList<Corpus> inCorpii, int inWindowSize)
 	{
-		super(inCorpus);
+		super(inCorpii);
 		windowSize = inWindowSize;
-		generateByTokenwiseSlidingWindow(inCorpus.getProcessedText(), windowSize);
-		
+		for(Corpus inCorpus : inCorpii)
+		{
+			
+			System.out.println(inCorpus.getProcessedText().size() + " is the number of sentences in this article and its title is " + inCorpus.getTitle());
+			generateByTokenwiseSlidingWindow(inCorpus.getProcessedText(), windowSize);
+		}
 	}
 	
 	public int getWindowSize()
@@ -32,8 +36,8 @@ public class TokenwiseNetwork extends Network
     */
    //TODO: Fix
    private void generateByTokenwiseSlidingWindow(ArrayList<ArrayList<Token>> lines, int windowSize) {
-   	
-       for (ArrayList<Token> line : lines) {
+	   System.out.println("The corpii size is " + lines.size() + " articles long");
+	   for (ArrayList<Token> line : lines) {
            for (int i = 0; i < line.size() - windowSize; i++) { //For Token in Sentences(Line)
                for (int j = i + 1; j < i + windowSize; j++) {	// Look forward comparing current token to all within the windowsize
                    if (!line.get(i).equals(line.get(j))) {		// Only record a Pair if they are different words. Does equals() actually compare string text here?

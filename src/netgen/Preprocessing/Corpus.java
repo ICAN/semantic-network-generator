@@ -50,22 +50,7 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
     	}
     }
     
-    /*
-//Accepts only alphanumeric characters and spaces
-//Filters out all other characters
-    public void setTitle(String title) {
-    	this.title = title.replaceAll("[^A-Za-z0-9 ]", "").trim();
-    }
-    
-    
-    public void setLink(String link) {
-    	this.link = link.trim();
-    	if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
-    		System.out.println("Link? " + this.link);
-    	}
-    }
-    */
-    
+
     
     //////////TEXT PROCESSING METHODS///////////
     public void generateFrequencyMap() {
@@ -132,4 +117,22 @@ public class Corpus extends RawCorpus implements ChronologicallyComparable {
     	processedText = inText;
     }
 
+    /*
+//Accepts only alphanumeric characters and spaces
+//Filters out all other characters
+    public void setTitle(String title) {
+    	this.title = title.replaceAll("[^A-Za-z0-9 ]", "").trim();
+    }
+    
+    
+    public void setLink(String link) {
+    	this.link = link.trim();
+    	if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+    		System.out.println("Link? " + this.link);
+    	}
+    }
+    */
+    
+    
+    
 }
