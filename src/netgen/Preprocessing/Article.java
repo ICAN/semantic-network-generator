@@ -8,10 +8,10 @@ import netgen.YearMonthDayComparator;
 import java.util.HashMap;
 
 /* This class should make available text for processing.
- *A distinction should be made between raw text and text in the middle of 
+ * A distinction should be made between raw text and text in the middle of 
  *		a processing pipeline.
- * The class extends RawCorpus, it should always remember where it started
- * 		through the rawText field inherited by RawCorpus superclass.
+ * The class extends RawArticle, it should always remember where it started
+ * 		through the rawText field inherited by RawArticle superclass.
  */
 
 public class Article extends RawArticle implements ChronologicallyComparable 
@@ -20,31 +20,13 @@ public class Article extends RawArticle implements ChronologicallyComparable
 	private HashMap<Token, Integer> tokenFrequency;
 	private Calendar calendar;
 
-
-	public Article(String inRaw, String inSource, String inDate, String inTitle, 
-			String inSummary, String inLink) 
-	{
-		super(inRaw,inSource,inDate, inTitle, inSummary.trim(), inLink);       
-	}
-
+	
 	public Article(RawArticle inCorpus)
 	{
 		super(inCorpus.getRawText(), inCorpus.getSource(), inCorpus.getDate(), 
 				inCorpus.getTitle(), inCorpus.getSummary(), inCorpus.getLink());
 	}
 
-	//Accepts only YYYY-MM-DD format
-	//Warns & sets to "UNKOWN DATE" if provided non-matching string
-	public void setDate(String date) {
-		if (date.trim().matches("[0-9]{4}(-[0-9]{2}){2}")) {
-			this.calendar.set(Integer.parseInt(date.substring(0, 3)),
-					Integer.parseInt(date.substring(5, 6)),
-					Integer.parseInt(date.substring(8, 9)));
-		} else {
-			this.calendar.set(0, 0, 0);
-			System.out.println("Date? " + date);
-		}
-	}
 
 	//////////TEXT PROCESSING METHODS///////////
 	public void generateFrequencyMap() {
@@ -63,19 +45,39 @@ public class Article extends RawArticle implements ChronologicallyComparable
 		tokenFrequency = map;
 	}
 
-
-
+	@Override
+	public int compareTo(Object other) {
+		YearMonthDayComparator comparator = new YearMonthDayComparator();
+		return comparator.compare(this, other);
+	}
 
 	//ACCESSORS AND MUTATORS
+	
+	//Accepts only YYYY-MM-DD format
+	//Warns & sets to "UNKOWN DATE" if provided non-matching string
+	public void setDate(String date)
+	{
+		if (date.trim().matches("[0-9]{4}(-[0-9]{2}){2}")) {
+			this.calendar.set(Integer.parseInt(date.substring(0, 3)),
+					Integer.parseInt(date.substring(5, 6)),
+					Integer.parseInt(date.substring(8, 9)));
+		} else {
+			this.calendar.set(0, 0, 0);
+			System.out.println("Date? " + date);
+		}
+	}
+	
 	//Returns a set of all unique tokens in the corpus
-	public HashSet<Token> getTokenSet() {
+	public HashSet<Token> getTokenSet() 
+	{
 		HashSet<Token> tokenSet = new HashSet<>();
 		tokenSet.addAll(tokenFrequency.keySet());
 		return tokenSet;
 	}
 
 	//Returns the total number of tokens in the processed text
-	public int getTokenizedSize() {
+	public int getTokenizedSize() 
+	{
 		int count = 0;
 		for (ArrayList<Token> sentence : this.processedText) {
 			count += sentence.size();
@@ -96,11 +98,6 @@ public class Article extends RawArticle implements ChronologicallyComparable
 	}
 
 
-	@Override
-	public int compareTo(Object other) {
-		YearMonthDayComparator comparator = new YearMonthDayComparator();
-		return comparator.compare(this, other);
-	}
 
 	public ArrayList<ArrayList<Token>> getProcessedText() {
 		return processedText;
