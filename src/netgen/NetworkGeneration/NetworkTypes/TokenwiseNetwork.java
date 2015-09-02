@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import netgen.NetworkGeneration.Network;
 import netgen.NetworkGeneration.TokenPair;
-import netgen.Preprocessing.Corpus;
+import netgen.Preprocessing.Article;
 import netgen.Preprocessing.Token;
 
 public class TokenwiseNetwork extends Network
@@ -12,11 +12,11 @@ public class TokenwiseNetwork extends Network
 	
 	private int windowSize;
 	
-	public TokenwiseNetwork(ArrayList<Corpus> inCorpii, int inWindowSize)
+	public TokenwiseNetwork(ArrayList<Article> inCorpii, int inWindowSize)
 	{
 		super(inCorpii);
 		windowSize = inWindowSize;
-		for(Corpus inCorpus : inCorpii)
+		for(Article inCorpus : inCorpii)
 		{
 			
 			System.out.println(inCorpus.getProcessedText().size() + " is the number of sentences in this article and its title is " + inCorpus.getTitle());

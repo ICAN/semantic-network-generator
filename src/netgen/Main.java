@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import netgen.NetworkGeneration.NetworkTypes.TokenwiseNetwork;
-import netgen.Preprocessing.Corpus;
+import netgen.Preprocessing.Article;
 import netgen.Preprocessing.PreprocessingManager;
 import netgen.Preprocessing.Token;
 
@@ -17,7 +17,7 @@ public class Main {
 	public static void main(String[] args) throws Exception 
 	{
 		PreprocessingManager manager = new PreprocessingManager();
-		ArrayList<Corpus> tokenCorpii = manager.createTokenizedCorpii();
+		ArrayList<Article> tokenCorpii = manager.createTokenizedCorpii();
 		System.out.println(tokenCorpii.size() + " is the size of the tokenCorpii");
 		TokenwiseNetwork network = new TokenwiseNetwork(tokenCorpii, 1);
 		System.out.println("Done constructing network!");

@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import netgen.Preprocessing.Corpus;
-import netgen.Preprocessing.RawCorpus;
+import netgen.Preprocessing.Article;
+import netgen.Preprocessing.RawArticle;
 
 /**
  *
@@ -23,9 +23,9 @@ import netgen.Preprocessing.RawCorpus;
  */
 public class IO {
 
-	public static ArrayList<RawCorpus> importEntireSourcesFolder() throws Exception
+	public static ArrayList<RawArticle> importEntireSourcesFolder() throws Exception
 	{
-		ArrayList<RawCorpus> fullSourceFolderCorpii = new ArrayList<RawCorpus>();
+		ArrayList<RawArticle> fullSourceFolderCorpii = new ArrayList<RawArticle>();
 
 		String filepath = new File("").getAbsolutePath();
 		filepath = filepath.concat("/src/netgen/DataSources/Sources");
@@ -86,9 +86,9 @@ public class IO {
 
 	//Produces an arraylist of KTUU, ADN or Homer Tribune corpora 
 	//from unprocessed lines of text
-	public static ArrayList<RawCorpus> importCorpora(ArrayList<String> lines, String mode) {
+	public static ArrayList<RawArticle> importCorpora(ArrayList<String> lines, String mode) {
 
-		ArrayList<RawCorpus> corpora = new ArrayList<>();
+		ArrayList<RawArticle> corpora = new ArrayList<>();
 		ArrayList<String> rows = new ArrayList<>();
 		ArrayList<String> fields = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class IO {
 				String inTitle = fields.get(i - 1);
 				String inSummary = "";
 				String inLink = fields.get(i - 2);
-				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+				RawArticle rawCorpus = new RawArticle(inRaw, inSource, 
 						inDate, inTitle, inSummary, inLink);
 				corpora.add(rawCorpus);
 			}
@@ -132,7 +132,7 @@ public class IO {
 				String inTitle = fields.get(i - 1);
 				String inSummary = fields.get(i - 3);
 				String inLink = fields.get(i - 4);
-				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+				RawArticle rawCorpus = new RawArticle(inRaw, inSource, 
 						inDate, inTitle, inSummary, inLink);
 				corpora.add(rawCorpus);
 			}
@@ -147,7 +147,7 @@ public class IO {
 				String inTitle = fields.get(i - 1);
 				String inSummary = "";
 				String inLink = fields.get(i - 3);
-				RawCorpus rawCorpus = new RawCorpus(inRaw, inSource, 
+				RawArticle rawCorpus = new RawArticle(inRaw, inSource, 
 						inDate, inTitle, inSummary, inLink);
 				corpora.add(rawCorpus);
 			}

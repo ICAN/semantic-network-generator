@@ -14,20 +14,20 @@ import java.util.HashMap;
  * 		through the rawText field inherited by RawCorpus superclass.
  */
 
-public class Corpus extends RawCorpus implements ChronologicallyComparable 
+public class Article extends RawArticle implements ChronologicallyComparable 
 {
 	private ArrayList<ArrayList<Token>> processedText;
 	private HashMap<Token, Integer> tokenFrequency;
 	private Calendar calendar;
 
 
-	public Corpus(String inRaw, String inSource, String inDate, String inTitle, 
+	public Article(String inRaw, String inSource, String inDate, String inTitle, 
 			String inSummary, String inLink) 
 	{
 		super(inRaw,inSource,inDate, inTitle, inSummary.trim(), inLink);       
 	}
 
-	public Corpus(RawCorpus inCorpus)
+	public Article(RawArticle inCorpus)
 	{
 		super(inCorpus.getRawText(), inCorpus.getSource(), inCorpus.getDate(), 
 				inCorpus.getTitle(), inCorpus.getSummary(), inCorpus.getLink());

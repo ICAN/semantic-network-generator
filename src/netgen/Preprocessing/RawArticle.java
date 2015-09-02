@@ -1,7 +1,7 @@
 package netgen.Preprocessing;
 
 //Base class extended by the more commonly used Corpus class 
-public class RawCorpus
+public class RawArticle
 {
 	
 	// Fields set at point of importing
@@ -12,7 +12,7 @@ public class RawCorpus
 	private final String summary;
 	private final String link;
 	
-	public RawCorpus(String inRaw, String inSource, String inDate, String inTitle, 
+	public RawArticle(String inRaw, String inSource, String inDate, String inTitle, 
 			String inSummary, String inLink)
 	{
 		rawText = inRaw;

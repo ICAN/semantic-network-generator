@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import netgen.Preprocessing.Corpus;
+import netgen.Preprocessing.Article;
 import netgen.Preprocessing.Token;
 
 import java.util.Random;
@@ -16,10 +16,10 @@ public abstract class Network {
 
     protected HashMap<TokenPair, Double> edgeSet;
     //protected ArrayList<Edge> edgeList;
-	protected final ArrayList<Corpus> corpii;
+	protected final ArrayList<Article> corpii;
     
     //Simple constructor
-    public Network(ArrayList<Corpus> inCorpii) 
+    public Network(ArrayList<Article> inCorpii) 
     {
         corpii = inCorpii;
         edgeSet = new HashMap<TokenPair, Double>();

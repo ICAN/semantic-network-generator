@@ -10,16 +10,16 @@ import netgen.Preprocessing.Components.Tokenizer;
 public class PreprocessingManager
 {
 
-	public ArrayList<Corpus> createTokenizedCorpii() throws Exception
+	public ArrayList<Article> createTokenizedCorpii() throws Exception
 	{
 		// Reads every file in the Data Sources folder
-		ArrayList<RawCorpus> allRawCorpii = IO.importEntireSourcesFolder();
-		ArrayList<Corpus> finalCorpii = new ArrayList<Corpus>();
+		ArrayList<RawArticle> allRawCorpii = IO.importEntireSourcesFolder();
+		ArrayList<Article> finalCorpii = new ArrayList<Article>();
 		
 		ArrayList<ArrayList<Token>> tokenizedSentences = new ArrayList<ArrayList<Token>>();
 		System.out.println(allRawCorpii.size() + " is the number of articles in the full corpus");
 		SentenceSplitter sentences;
-		for( RawCorpus rawCorpus : allRawCorpii) // Iterate over all the raw articles from the three imported DB files
+		for( RawArticle rawCorpus : allRawCorpii) // Iterate over all the raw articles from the three imported DB files
 		{											// Is this really happening? Yes
 			
 			//System.out.println(rawCorpus.getTitle() + " is the title of this article");
@@ -39,7 +39,7 @@ public class PreprocessingManager
 				System.out.println(tokenizedSentences.get(0).size());
 			}
 			
-			Corpus processedCorpus = new Corpus(rawCorpus);
+			Article processedCorpus = new Article(rawCorpus);
 			processedCorpus.setProcessedText(tokenizedSentences);
 			finalCorpii.add(processedCorpus);			
 			System.out.println("finalCorpii is this big: " + finalCorpii.size());

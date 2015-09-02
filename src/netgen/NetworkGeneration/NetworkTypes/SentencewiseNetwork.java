@@ -6,33 +6,33 @@ import java.util.Map.Entry;
 
 import netgen.NetworkGeneration.Network;
 import netgen.NetworkGeneration.TokenPair;
-import netgen.Preprocessing.Corpus;
+import netgen.Preprocessing.Article;
 import netgen.Preprocessing.Token;
 
 public class SentencewiseNetwork extends Network
 {
-	public SentencewiseNetwork(ArrayList<Corpus> inCorpii, int inMaxWindowSentences, int inMaxWindowTokens)
+	public SentencewiseNetwork(ArrayList<Article> inCorpii, int inMaxWindowSentences, int inMaxWindowTokens)
 	{
 		super(inCorpii);
 		if(inMaxWindowSentences == 0 && inMaxWindowTokens == 0)
 		{
-			for(Corpus corpus : inCorpii )
+			for(Article corpus : inCorpii )
 			{
 				generateBySingleSentenceWindow(corpus.getProcessedText());
 			}
 		}
 		else
 		{
-			for( Corpus corpus : inCorpii)
+			for( Article corpus : inCorpii)
 			{
 				generateByMultiSentenceSlidingWindow(corpus.getProcessedText(), inMaxWindowSentences, inMaxWindowTokens);
 			}
 		}
 	}
-	public SentencewiseNetwork(ArrayList<Corpus> inCorpii)
+	public SentencewiseNetwork(ArrayList<Article> inCorpii)
 	{
 		super(inCorpii);
-		for(Corpus corpus : inCorpii)
+		for(Article corpus : inCorpii)
 		{
 			generateBySingleSentenceWindow(corpus.getProcessedText());
 		}
