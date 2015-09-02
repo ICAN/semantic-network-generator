@@ -18,12 +18,27 @@ public class RawCorpus
 		rawText = inRaw;
 		source = inSource;
 		date = inDate;
-		title = inTitle.replaceAll("[^A-Za-z0-9 ]", "").trim();
+		title = initTitle(inTitle);
 		summary = inSummary;
-		link = inLink.trim();
+		link = initLink(inLink);
 	}
 	
+		//Accepts only alphanumeric characters and spaces
+		//Filters out all other characters
+	    private String initTitle(String inTitle) 
+	    {
+	    	return inTitle.replaceAll("[^A-Za-z0-9 ]", "").trim();
+	    }
 
+
+	    private String initLink(String inLink) 
+	    {
+	    	 return inLink.trim();
+	    	//if (!this.link.matches("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+	    	//	System.out.println("Link? " + this.link);}
+	    }
+	
+	
 	// There should be no reassigning of class members after construction
 	public String getRawText()
 	{

@@ -96,7 +96,7 @@ public class SentencewiseNetwork extends Network
 			}
 
 			//Add the window-level network to the main network
-			//TODO: entry is not used here, seems like we just need to iterate over the size of the entrySet
+			//TODO: entry is not used here, seems like we just need to iterate over the size of the windowNetwork entrySet
 			for (Entry<TokenPair, Double> entry : windowNetwork.entrySet()) {
 				edgeSet = sum(edgeSet, windowNetwork);
 			}
