@@ -79,7 +79,7 @@ public class Article extends RawArticle implements ChronologicallyComparable
 	public int getTokenizedSize() 
 	{
 		int count = 0;
-		for (ArrayList<Token> sentence : this.processedText) {
+		for (ArrayList<Token> sentence : getProcessedText()) {
 			count += sentence.size();
 		}
 		return count;
@@ -97,14 +97,11 @@ public class Article extends RawArticle implements ChronologicallyComparable
 		return calendar.get(Calendar.YEAR);
 	}
 
-
-
 	public ArrayList<ArrayList<Token>> getProcessedText() {
 		return processedText;
 	}
 
-	public void setProcessedText(ArrayList<ArrayList<Token>> inText)
-	{
+	public void setProcessedText(ArrayList<ArrayList<Token>> inText) {
 		processedText = inText;
 	}
 

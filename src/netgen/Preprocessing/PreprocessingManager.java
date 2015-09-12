@@ -12,39 +12,42 @@ public class PreprocessingManager
 
 	public ArrayList<Article> createTokenizedCorpii() throws Exception
 	{
+		/*	This is not as simple as a manager as I had hoped. The problem
+		 * 	lies in the conversion of values passed between the components.
+		 * 	This input handling is something the components themselves could 
+		 * 	do. 
+		 * 	
+		 * 	I would like a pipeline instantiation to look something like this
+		 * 	ArrayList<Article> tokenizedSentences = new new Tokenizer(new SentenceSplitter
+		 * 			(IO.importEntireSourcesFolder()).getProcessedText();	
+		 * 
+		 * 
+		 */
+		
+		
 		// Reads every file in the Data Sources folder
-		ArrayList<RawArticle> allRawCorpii = IO.importEntireSourcesFolder();
-		ArrayList<Article> finalCorpii = new ArrayList<Article>();
+		ArrayList<RawArticle> allRawArticles = IO.importEntireSourcesFolder();
+		ArrayList<Article> finalArticles = new ArrayList<Article>();
 		
 		ArrayList<ArrayList<Token>> tokenizedSentences = new ArrayList<ArrayList<Token>>();
-		System.out.println(allRawCorpii.size() + " is the number of articles in the full corpus");
+		System.out.println(allRawArticles.size() + " is the number of articles in the full corpus");
 		SentenceSplitter sentences;
-		for( RawArticle rawCorpus : allRawCorpii) // Iterate over all the raw articles from the three imported DB files
-		{											// Is this really happening? Yes
-			
-			//System.out.println(rawCorpus.getTitle() + " is the title of this article");
-			//System.out.println(rawCorpus.getRawText().length() + " is the length of this article string");
-			sentences = new SentenceSplitter(rawCorpus.getRawText());
-			System.out.println(sentences.getProcessedCorpus().size() + " is the number of sentences in the article");
-			System.out.println(sentences.getProcessedCorpus().get(0) + " is the first sentence in the article");
-			System.out.println(sentences.getProcessedCorpus().get(1) + " is the second sentence in the article");
-				
+		for( RawArticle rawCorpus : allRawArticles) // Iterate over all the raw articles from the three imported DB files
+		{
+			sentences = new SentenceSplitter(rawCorpus.getRawText());	
 			for(String sentence : sentences.getProcessedCorpus())
 			{
 				
 				Tokenizer tokens = new Tokenizer(sentence);
-				//System.out.println(tokens.getProcessedCorpus());
 				tokenizedSentences.add(tokens.getProcessedCorpus());
-				System.out.println("Length of tokenized Sentences is " + tokenizedSentences.size());
-				System.out.println(tokenizedSentences.get(0).size());
 			}
 			
 			Article processedCorpus = new Article(rawCorpus);
 			processedCorpus.setProcessedText(tokenizedSentences);
-			finalCorpii.add(processedCorpus);			
-			System.out.println("finalCorpii is this big: " + finalCorpii.size());
+			finalArticles.add(processedCorpus);
+			System.out.println("finalCorpii is this big: " + finalArticles.size());
 		}
-		return finalCorpii;
+		return finalArticles;
 	}
 	
 	
